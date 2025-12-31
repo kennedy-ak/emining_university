@@ -102,7 +102,8 @@ Create a `.env` file in the project root:
 # Django Configuration
 SECRET_KEY=your-super-secret-key-here
 DEBUG=True
-ALLOWED_HOSTS=localhost,127.0.0.1
+ALLOWED_HOSTS=localhost,127.0.0.1,emining.digitalrepublic.space
+CSRF_TRUSTED_ORIGINS=https://emining.digitalrepublic.space
 
 # Database Configuration (PostgreSQL for production)
 DB_NAME=emining_db
@@ -213,8 +214,8 @@ Set these environment variables for production:
 # Security
 SECRET_KEY=your-production-secret-key
 DEBUG=False
-ALLOWED_HOSTS=yourdomain.com,www.yourdomain.com
-CSRF_TRUSTED_ORIGINS=https://yourdomain.com
+ALLOWED_HOSTS=emining.digitalrepublic.space,www.emining.digitalrepublic.space
+CSRF_TRUSTED_ORIGINS=https://emining.digitalrepublic.space
 
 # Database
 DB_NAME=emining_prod
@@ -234,13 +235,13 @@ SECURE_HSTS_SECONDS=31536000
 ```nginx
 server {
     listen 80;
-    server_name yourdomain.com www.yourdomain.com;
+    server_name emining.digitalrepublic.space www.emining.digitalrepublic.space;
     return 301 https://$server_name$request_uri;
 }
 
 server {
     listen 443 ssl;
-    server_name yourdomain.com www.yourdomain.com;
+    server_name emining.digitalrepublic.space www.emining.digitalrepublic.space;
     
     ssl_certificate /path/to/certificate.crt;
     ssl_certificate_key /path/to/private.key;

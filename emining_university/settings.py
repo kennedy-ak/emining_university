@@ -27,8 +27,43 @@ SECRET_KEY = config('SECRET_KEY', default='django-insecure-kyc_6+%f%djssvrv4uff#
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=True, cast=bool)
 
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='*').split(',')
+# ALLOWED_HOSTS configuration
+try:
+    allowed_hosts_str = config('ALLOWED_HOSTS', default='localhost,127.0.0.1,emining.digitalrepublic.space')
+    if isinstance(allowed_hosts_str, str):
+        ALLOWED_HOSTS = [host.strip() for host in allowed_hosts_str.split(',')]
+    else:
+        ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'emining.digitalrepublic.space']
+except:
+    ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'emining.digitalrepublic.space']
 
+# CSRF Configuration
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:8000',
+    'http://127.0.0.1:8000',
+    'https://emining.digitalrepublic.space',
+]
+
+# CORS Configuration (for API access)
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:3000',
+    'http://127.0.0.1:3000',
+    'https://emining.digitalrepublic.space',
+]
+
+CORS_ALLOW_CREDENTIALS = True
+
+# Security Settings for Production
+if not DEBUG:
+    SECURE_SSL_REDIRECT = True
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SECURE_HSTS_SECONDS = 31536000
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    SECURE_BROWSER_XSS_FILTER = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
 
 # Application definition
 
@@ -39,6 +74,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'corsheaders',  # CORS support
     'courses',
     'crispy_forms',
     'crispy_bootstrap5',
@@ -46,6 +82,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
