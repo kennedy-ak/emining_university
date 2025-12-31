@@ -1,0 +1,146 @@
+{% extends 'custom_admin/base.html' %}
+
+{% block title %}Enrollments Management{% endblock %}
+{% block page_title %}Enrollments Management{% endblock %}
+
+{% block content %}
+<!-- Filter Section -->
+<div class="filter-section">
+    <form method="get" class="row g-3">
+        <div class="col-md-4">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" name="search" class="form-control" placeholder="Search enrollments..." value="{{ search_query }}">
+            </div>
+        </div>
+        <div class="col-md-3">
+            <select name="course" class="form-select">
+                <option value="">All Courses</option>
+                {% for course in courses %}
+                <option value="{{ course.id }}" {% if selected_course == course.id|stringformat:"s" %}selected{% endif %}>
+                    {{ course.title }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-2">
+            <select name="completion" class="form-select">
+                <option value="">All Enrollments</option>
+                <option value="completed" {% if selected_completion == 'completed' %}selected{% endif %}>Completed</option>
+                <option value="active" {% if selected_completion == 'active' %}selected{% endif %}>In Progress</option>
+            </select>
+        </div>
+        <div class="col-md-1">
+            <button type="submit" class="btn btn-primary w-100 btn-custom">
+                <i class="fas fa-filter"></i>
+            </button>
+        </div>
+        <div class="col-md-2 text-end">
+            <span class="badge bg-primary p-2" style="font-size: 1rem;">
+                Total: {{ total_enrollments }}
+            </span>
+        </div>
+    </form>
+</div>
+
+<!-- Enrollments Table -->
+<div class="card-custom">
+    <div class="card-header">
+        <i class="fas fa-user-graduate"></i> Enrollments List
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-custom mb-0">
+                <thead>
+                    <tr>
+                        <th>Student</th>
+                        <th>Course</th>
+                        <th>Progress</th>
+                        <th>Status</th>
+                        <th>Enrolled</th>
+                        <th>Completed</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for enrollment in enrollments %}
+                    <tr>
+                        <td>
+                            <a href="{% url 'courses:admin_user_detail' enrollment.student.id %}" class="text-decoration-none">
+                                {{ enrollment.student.username }}
+                            </a>
+                        </td>
+                        <td>
+                            <a href="{% url 'courses:admin_course_detail' enrollment.course.id %}" class="text-decoration-none">
+                                {{ enrollment.course.title|truncatewords:5 }}
+                            </a>
+                        </td>
+                        <td>
+                            <div class="progress" style="height: 20px; width: 150px;">
+                                <div class="progress-bar {% if enrollment.progress_percentage == 100 %}bg-success{% endif %}" role="progressbar" style="width: {{ enrollment.progress_percentage }}%">
+                                    {{ enrollment.progress_percentage|floatformat:0 }}%
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            {% if enrollment.completed %}
+                            <span class="badge bg-success">Completed</span>
+                            {% else %}
+                            <span class="badge bg-primary">In Progress</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ enrollment.enrolled_at|date:"M d, Y" }}</td>
+                        <td>
+                            {% if enrollment.completed_at %}
+                            {{ enrollment.completed_at|date:"M d, Y" }}
+                            {% else %}
+                            <span class="text-muted">-</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{% url 'courses:admin_enrollment_detail' enrollment.id %}" class="btn btn-sm btn-outline-primary btn-custom">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center text-muted py-4">
+                            <i class="fas fa-user-graduate fa-3x mb-3 d-block"></i>
+                            No enrollments found
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Pagination -->
+{% if enrollments.has_other_pages %}
+<nav aria-label="Page navigation" class="mt-4">
+    <ul class="pagination justify-content-center">
+        {% if enrollments.has_previous %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ enrollments.previous_page_number }}&search={{ search_query }}&course={{ selected_course }}&completion={{ selected_completion }}">
+                <i class="fas fa-chevron-left"></i> Previous
+            </a>
+        </li>
+        {% endif %}
+
+        <li class="page-item active">
+            <span class="page-link">Page {{ enrollments.number }} of {{ enrollments.paginator.num_pages }}</span>
+        </li>
+
+        {% if enrollments.has_next %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ enrollments.next_page_number }}&search={{ search_query }}&course={{ selected_course }}&completion={{ selected_completion }}">
+                Next <i class="fas fa-chevron-right"></i>
+            </a>
+        </li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}
+{% endblock %}

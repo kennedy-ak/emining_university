@@ -1,0 +1,110 @@
+{% extends 'custom_admin/base.html' %}
+
+{% block title %}Certificates Management{% endblock %}
+{% block page_title %}Certificates Management{% endblock %}
+
+{% block content %}
+<!-- Filter Section -->
+<div class="filter-section">
+    <form method="get" class="row g-3">
+        <div class="col-md-6">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" name="search" class="form-control" placeholder="Search by certificate ID, student, or course..." value="{{ search_query }}">
+            </div>
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-primary w-100 btn-custom">
+                <i class="fas fa-search"></i> Search
+            </button>
+        </div>
+        <div class="col-md-4 text-end">
+            <span class="badge bg-info p-2" style="font-size: 1rem;">
+                Total Certificates: {{ total_certificates }}
+            </span>
+        </div>
+    </form>
+</div>
+
+<!-- Certificates Table -->
+<div class="card-custom">
+    <div class="card-header">
+        <i class="fas fa-certificate"></i> Certificates List
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-custom mb-0">
+                <thead>
+                    <tr>
+                        <th>Certificate ID</th>
+                        <th>Student</th>
+                        <th>Course</th>
+                        <th>Issued Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for certificate in certificates %}
+                    <tr>
+                        <td><code>{{ certificate.certificate_id }}</code></td>
+                        <td>
+                            <a href="{% url 'courses:admin_user_detail' certificate.student.id %}" class="text-decoration-none">
+                                {{ certificate.student.username }}
+                            </a>
+                        </td>
+                        <td>
+                            <a href="{% url 'courses:admin_course_detail' certificate.course.id %}" class="text-decoration-none">
+                                {{ certificate.course.title }}
+                            </a>
+                        </td>
+                        <td>{{ certificate.issued_at|date:"M d, Y H:i" }}</td>
+                        <td>
+                            <a href="{% url 'courses:download_certificate' certificate.certificate_id %}" class="btn btn-sm btn-outline-success btn-custom" target="_blank">
+                                <i class="fas fa-download"></i> Download
+                            </a>
+                            <a href="{% url 'courses:verify_certificate' certificate.certificate_id %}" class="btn btn-sm btn-outline-info btn-custom" target="_blank">
+                                <i class="fas fa-check-circle"></i> Verify
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center text-muted py-4">
+                            <i class="fas fa-certificate fa-3x mb-3 d-block"></i>
+                            No certificates found
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Pagination -->
+{% if certificates.has_other_pages %}
+<nav aria-label="Page navigation" class="mt-4">
+    <ul class="pagination justify-content-center">
+        {% if certificates.has_previous %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ certificates.previous_page_number }}&search={{ search_query }}">
+                <i class="fas fa-chevron-left"></i> Previous
+            </a>
+        </li>
+        {% endif %}
+
+        <li class="page-item active">
+            <span class="page-link">Page {{ certificates.number }} of {{ certificates.paginator.num_pages }}</span>
+        </li>
+
+        {% if certificates.has_next %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ certificates.next_page_number }}&search={{ search_query }}">
+                Next <i class="fas fa-chevron-right"></i>
+            </a>
+        </li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}
+{% endblock %}

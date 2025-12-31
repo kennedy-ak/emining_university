@@ -1,0 +1,16 @@
+[
+    {
+        "full_name": "Dr. John Smith",
+        "first_name": "John",
+        "last_name": "Smith",
+        "email": "john.smith@emining.edu",
+        "bio": "Dr. John Smith is a professor of Mining Engineering with over 20 years of experience in the mining industry. He specializes in mineral exploration and mine planning."
+    },
+    {
+        "full_name": "Prof. Jane Doe",
+        "first_name": "Jane",
+        "last_name": "Doe",
+        "email": "jane.doe@emining.edu",
+        "bio": "Prof. Jane Doe has extensive experience in mining law and regulatory frameworks. She has worked with various mining companies and government agencies."
+    }
+]

@@ -1,0 +1,147 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}Start a Discussion - {{ course.title }}{% endblock %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <!-- Breadcrumb -->
+                <nav aria-label="breadcrumb" class="mb-4">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">
+                            <a href="{% url 'courses:courses_list' %}">Courses</a>
+                        </li>
+                        <li class="breadcrumb-item">
+                            <a href="{% url 'courses:course_detail' course.slug %}">{{ course.title|truncatewords:3 }}</a>
+                        </li>
+                        <li class="breadcrumb-item">
+                            <a href="{% url 'courses:course_discussions' course.slug %}">Discussions</a>
+                        </li>
+                        <li class="breadcrumb-item active">New Discussion</li>
+                    </ol>
+                </nav>
+
+                <div class="card shadow-sm">
+                    <div class="card-body p-4">
+                        <h3 class="fw-bold mb-4">
+                            <i class="fas fa-plus-circle text-primary me-2"></i>
+                            Start a New Discussion
+                        </h3>
+
+                        <!-- Course Info -->
+                        <div class="alert alert-light border mb-4">
+                            <div class="d-flex align-items-center">
+                                {% if course.image %}
+                                <img src="{{ course.image.url }}" alt="{{ course.title }}" class="rounded me-3" style="width: 60px; height: 60px; object-fit: cover;">
+                                {% else %}
+                                <div class="bg-primary text-white rounded me-3 d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                                    <i class="fas fa-book"></i>
+                                </div>
+                                {% endif %}
+                                <div>
+                                    <h6 class="mb-1">{{ course.title }}</h6>
+                                    <p class="text-muted small mb-0">
+                                        <i class="fas fa-user me-1"></i>{{ course.instructor.full_name }}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Discussion Form -->
+                        <form method="post">
+                            {% csrf_token %}
+
+                            <div class="mb-4">
+                                <label for="id_title" class="form-label fw-bold">Discussion Title *</label>
+                                {{ form.title }}
+                                {% if form.title.errors %}
+                                <div class="text-danger small mt-1">{{ form.title.errors }}</div>
+                                {% endif %}
+                                <small class="text-muted">Choose a clear, descriptive title for your discussion</small>
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="id_content" class="form-label fw-bold">Your Question or Topic *</label>
+                                {{ form.content }}
+                                {% if form.content.errors %}
+                                <div class="text-danger small mt-1">{{ form.content.errors }}</div>
+                                {% endif %}
+                                <small class="text-muted">Provide details about your question or topic. Be specific to get better responses.</small>
+                            </div>
+
+                            <!-- Form Actions -->
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-paper-plane me-2"></i>
+                                    Create Discussion
+                                </button>
+                                <a href="{% url 'courses:course_discussions' course.slug %}" class="btn btn-outline-secondary">
+                                    <i class="fas fa-times me-2"></i>Cancel
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Discussion Tips -->
+                <div class="card shadow-sm mt-4">
+                    <div class="card-body">
+                        <h6 class="fw-bold mb-3">
+                            <i class="fas fa-lightbulb text-warning me-2"></i>Tips for Creating Great Discussions
+                        </h6>
+                        <ul class="small text-muted mb-0">
+                            <li class="mb-2"><strong>Be specific:</strong> Clearly state your question or topic</li>
+                            <li class="mb-2"><strong>Provide context:</strong> Include relevant background information</li>
+                            <li class="mb-2"><strong>Stay on topic:</strong> Keep discussions related to the course content</li>
+                            <li class="mb-2"><strong>Be respectful:</strong> Treat fellow students and instructors with courtesy</li>
+                            <li class="mb-2"><strong>Search first:</strong> Check if your question has already been answered</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% if messages %}
+<div class="position-fixed top-0 end-0 p-3" style="z-index: 11">
+    {% for message in messages %}
+    <div class="toast show align-items-center text-white bg-{{ message.tags }} border-0" role="alert">
+        <div class="d-flex">
+            <div class="toast-body">{{ message }}</div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    #id_title {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        font-size: 1rem;
+    }
+    #id_content {
+        width: 100%;
+        min-height: 200px;
+        padding: 10px;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        font-family: inherit;
+    }
+    #id_title:focus, #id_content:focus {
+        border-color: #0d6efd;
+        outline: 0;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    }
+</style>
+{% endblock %}

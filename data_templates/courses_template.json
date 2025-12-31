@@ -1,0 +1,22 @@
+[
+    {
+        "title": "Mining Law and Regulatory Framework",
+        "description": "This course covers the legal and regulatory aspects of mining operations, including licensing, environmental regulations, and compliance requirements.",
+        "instructor": "Prof. Jane Doe",
+        "category": "Mining Law",
+        "level": "intermediate",
+        "price": 1500.00,
+        "currency": "₵",
+        "is_featured": false
+    },
+    {
+        "title": "Mineral Exploration and Geology",
+        "description": "An introduction to mineral exploration techniques, geological mapping, and resource estimation methods.",
+        "instructor": "Dr. John Smith",
+        "category": "Geology",
+        "level": "beginner",
+        "price": 1200.00,
+        "currency": "₵",
+        "is_featured": true
+    }
+]

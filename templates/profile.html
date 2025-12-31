@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}My Profile - E-miningCampus{% endblock %}
+
+{% block content %}
+<div class="container mt-5 mb-5">
+    <div class="row">
+        <div class="col-md-3">
+            <div class="card shadow-sm">
+                <div class="card-body text-center">
+                    {% if profile.profile_picture %}
+                        <img src="{{ profile.profile_picture.url }}" alt="{{ user.get_full_name }}" class="rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover;">
+                    {% else %}
+                        <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 150px; height: 150px; font-size: 48px;">
+                            {{ user.first_name.0|upper }}{{ user.last_name.0|upper }}
+                        </div>
+                    {% endif %}
+                    <h5>{{ user.get_full_name|default:user.username }}</h5>
+                    <p class="text-muted">{{ user.email }}</p>
+                </div>
+            </div>
+
+            <div class="list-group mt-3 shadow-sm">
+                <a href="{% url 'courses:dashboard' %}" class="list-group-item list-group-item-action">
+                    <i class="fas fa-tachometer-alt me-2"></i> Dashboard
+                </a>
+                <a href="{% url 'courses:profile' %}" class="list-group-item list-group-item-action active">
+                    <i class="fas fa-user me-2"></i> Profile
+                </a>
+                <a href="{% url 'courses:my_certificates' %}" class="list-group-item list-group-item-action">
+                    <i class="fas fa-certificate me-2"></i> Certificates
+                </a>
+                <a href="{% url 'courses:logout' %}" class="list-group-item list-group-item-action text-danger">
+                    <i class="fas fa-sign-out-alt me-2"></i> Logout
+                </a>
+            </div>
+        </div>
+
+        <div class="col-md-9">
+            <div class="card shadow-sm">
+                <div class="card-body p-4">
+                    <h3 class="mb-4">Edit Profile</h3>
+
+                    {% if messages %}
+                        {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Username</label>
+                                <input type="text" class="form-control" value="{{ user.username }}" disabled>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Email</label>
+                                <input type="email" class="form-control" value="{{ user.email }}" disabled>
+                            </div>
+                        </div>
+
+                        {{ form|crispy }}
+
+                        <div class="mt-4">
+                            <button type="submit" class="btn btn-primary">Update Profile</button>
+                            <a href="{% url 'courses:dashboard' %}" class="btn btn-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

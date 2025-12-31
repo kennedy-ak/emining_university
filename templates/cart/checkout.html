@@ -1,0 +1,239 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Checkout - E-miningCampus{% endblock %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <h2 class="fw-bold mb-4">
+            <i class="fas fa-credit-card me-2"></i>Checkout
+        </h2>
+
+        {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endfor %}
+        {% endif %}
+
+        <div class="row">
+            <!-- Order Details -->
+            <div class="col-lg-8">
+                <!-- Customer Information -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-user me-2"></i>Customer Information
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label text-muted small">Full Name</label>
+                                <p class="fw-bold mb-0">{{ user.get_full_name|default:user.username }}</p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label text-muted small">Email Address</label>
+                                <p class="fw-bold mb-0">{{ user.email }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Order Items -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-list me-2"></i>Order Items ({{ items.count }})
+                        </h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="list-group list-group-flush">
+                            {% for item in items %}
+                            <div class="list-group-item">
+                                <div class="row align-items-center">
+                                    <div class="col-md-2">
+                                        {% if item.course.image %}
+                                        <img src="{{ item.course.image.url }}" alt="{{ item.course.title }}" class="img-fluid rounded">
+                                        {% else %}
+                                        <div class="bg-primary text-white rounded d-flex align-items-center justify-content-center" style="height: 60px;">
+                                            <i class="fas fa-book"></i>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-8">
+                                        <h6 class="mb-1">{{ item.course.title }}</h6>
+                                        <p class="text-muted small mb-0">
+                                            <i class="fas fa-user me-1"></i>{{ item.course.instructor.full_name }}
+                                        </p>
+                                    </div>
+                                    <div class="col-md-2 text-end">
+                                        <strong class="text-primary">GHS {{ item.course.price }}</strong>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Payment Information -->
+                <div class="card shadow-sm">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-lock me-2"></i>Payment Method
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-info mb-0">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-info-circle fa-2x me-3"></i>
+                                <div>
+                                    <h6 class="mb-1">Secure Payment via Paystack</h6>
+                                    <p class="mb-0 small">
+                                        You will be redirected to Paystack's secure payment page.
+                                        We accept all major cards (Visa, Mastercard), Mobile Money, and Bank Transfer.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Order Summary -->
+            <div class="col-lg-4">
+                <div class="card shadow-sm sticky-top" style="top: 20px;">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">Order Summary</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Subtotal ({{ items.count }} item{{ items.count|pluralize }}):</span>
+                            <span>GHS {{ total }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Tax:</span>
+                            <span>GHS 0.00</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2 text-muted small">
+                            <span>Platform Fee:</span>
+                            <span>GHS 0.00</span>
+                        </div>
+                        <hr>
+                        <div class="d-flex justify-content-between mb-4">
+                            <strong class="fs-5">Total:</strong>
+                            <strong class="text-primary fs-4">GHS {{ total }}</strong>
+                        </div>
+
+                        <!-- Payment Button -->
+                        <div class="d-grid gap-2 mb-3">
+                            <button id="payButton" class="btn btn-success btn-lg">
+                                <i class="fas fa-lock me-2"></i>Pay Now - GHS {{ total }}
+                            </button>
+                            <a href="{% url 'courses:cart' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Back to Cart
+                            </a>
+                        </div>
+
+                        <!-- Security Badges -->
+                        <div class="text-center mt-4">
+                            <small class="text-muted d-block mb-2">
+                                <i class="fas fa-shield-alt me-1"></i>
+                                SSL Secured Payment
+                            </small>
+                            <small class="text-muted">
+                                <i class="fas fa-lock me-1"></i>
+                                Powered by Paystack
+                            </small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Money-Back Guarantee -->
+                <div class="card shadow-sm mt-4">
+                    <div class="card-body text-center">
+                        <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+                        <h6 class="fw-bold mb-2">30-Day Money-Back Guarantee</h6>
+                        <p class="small text-muted mb-0">
+                            Not satisfied? Get a full refund within 30 days of purchase.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Loading Overlay -->
+<div id="loadingOverlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 9999;">
+    <div class="d-flex align-items-center justify-content-center h-100">
+        <div class="text-center text-white">
+            <div class="spinner-border mb-3" role="status" style="width: 3rem; height: 3rem;">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <h5>Processing your payment...</h5>
+            <p>Please wait, do not close this window</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://js.paystack.co/v1/inline.js"></script>
+<script>
+    document.getElementById('payButton').addEventListener('click', function() {
+        // Show loading overlay
+        document.getElementById('loadingOverlay').style.display = 'block';
+
+        // Initiate payment
+        fetch("{% url 'courses:initiate_payment' %}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                // Hide loading overlay
+                document.getElementById('loadingOverlay').style.display = 'none';
+                alert('Error: ' + data.error);
+                return;
+            }
+
+            // Initialize Paystack popup
+            var handler = PaystackPop.setup({
+                key: '{{ paystack_public_key }}',
+                email: '{{ user.email }}',
+                amount: {{ total|floatformat:2 }} * 100, // Amount in pesewas
+                currency: 'GHS',
+                ref: data.reference,
+                callback: function(response) {
+                    // Payment successful, redirect to verification
+                    window.location.href = "{% url 'courses:payment_verify' %}?reference=" + response.reference;
+                },
+                onClose: function() {
+                    // Hide loading overlay when user closes
+                    document.getElementById('loadingOverlay').style.display = 'none';
+                    alert('Transaction was cancelled');
+                }
+            });
+
+            // Hide loading overlay and open Paystack
+            document.getElementById('loadingOverlay').style.display = 'none';
+            handler.openIframe();
+        })
+        .catch(error => {
+            // Hide loading overlay
+            document.getElementById('loadingOverlay').style.display = 'none';
+            alert('Error initiating payment: ' + error);
+            console.error('Error:', error);
+        });
+    });
+</script>
+{% endblock %}

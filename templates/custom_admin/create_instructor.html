@@ -1,0 +1,126 @@
+{% extends 'custom_admin/base.html' %}
+{% load static %}
+
+{% block title %}Create New Instructor - Admin{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>Create New Instructor</h2>
+                <a href="{% url 'courses:admin_instructors_list' %}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to Instructors
+                </a>
+            </div>
+
+            <div class="card-custom">
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+
+                        {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {{ form.non_field_errors }}
+                        </div>
+                        {% endif %}
+
+                        <!-- User Account Information -->
+                        <div class="mb-4">
+                            <h4 class="text-primary mb-3">
+                                <i class="fas fa-user-lock"></i> Account Information
+                            </h4>
+                            <p class="text-muted">Login credentials for the instructor</p>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="id_username" class="form-label">Username *</label>
+                                    {{ form.username }}
+                                    {% if form.username.help_text %}
+                                    <small class="form-text text-muted">{{ form.username.help_text }}</small>
+                                    {% endif %}
+                                    {% if form.username.errors %}
+                                    <div class="text-danger">{{ form.username.errors }}</div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label for="id_email" class="form-label">Email *</label>
+                                    {{ form.email }}
+                                    {% if form.email.errors %}
+                                    <div class="text-danger">{{ form.email.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="id_password" class="form-label">Password *</label>
+                                    {{ form.password }}
+                                    {% if form.password.help_text %}
+                                    <small class="form-text text-muted">{{ form.password.help_text }}</small>
+                                    {% endif %}
+                                    {% if form.password.errors %}
+                                    <div class="text-danger">{{ form.password.errors }}</div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label for="id_password_confirm" class="form-label">Confirm Password *</label>
+                                    {{ form.password_confirm }}
+                                    {% if form.password_confirm.errors %}
+                                    <div class="text-danger">{{ form.password_confirm.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <!-- Instructor Profile Information -->
+                        <div class="mb-4">
+                            <h4 class="text-primary mb-3">
+                                <i class="fas fa-user-tie"></i> Instructor Profile
+                            </h4>
+                            <p class="text-muted">Public information about the instructor</p>
+
+                            <div class="mb-3">
+                                <label for="id_full_name" class="form-label">Full Name *</label>
+                                {{ form.full_name }}
+                                {% if form.full_name.errors %}
+                                <div class="text-danger">{{ form.full_name.errors }}</div>
+                                {% endif %}
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="id_bio" class="form-label">Biography</label>
+                                {{ form.bio }}
+                                <small class="form-text text-muted">Brief biography of the instructor (optional)</small>
+                                {% if form.bio.errors %}
+                                <div class="text-danger">{{ form.bio.errors }}</div>
+                                {% endif %}
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="id_profile_image" class="form-label">Profile Image</label>
+                                {{ form.profile_image }}
+                                <small class="form-text text-muted">Upload a profile picture (optional)</small>
+                                {% if form.profile_image.errors %}
+                                <div class="text-danger">{{ form.profile_image.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="text-end">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-save"></i> Create Instructor
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

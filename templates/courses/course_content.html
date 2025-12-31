@@ -1,0 +1,144 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ course.title }} - Content{% endblock %}
+
+{% block content %}
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row">
+            <!-- Course Sidebar -->
+            <div class="col-lg-4 mb-4">
+                <div class="card shadow-sm sticky-top" style="top: 20px;">
+                    <div class="card-body">
+                        <h5 class="card-title fw-bold">{{ course.title }}</h5>
+                        <p class="text-muted small mb-3">
+                            <i class="fas fa-user me-1"></i>{{ course.instructor.full_name }}
+                        </p>
+
+                        <!-- Progress Section -->
+                        <div class="mb-4">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="small fw-bold">Your Progress</span>
+                                <span class="small fw-bold text-primary">{{ enrollment.progress_percentage }}%</span>
+                            </div>
+                            <div class="progress" style="height: 10px;">
+                                <div class="progress-bar bg-success" role="progressbar" style="width: {{ enrollment.progress_percentage }}%"></div>
+                            </div>
+                        </div>
+
+                        {% if enrollment.completed %}
+                        <div class="alert alert-success">
+                            <i class="fas fa-trophy me-2"></i>
+                            <strong>Congratulations!</strong> You've completed this course!
+                        </div>
+                        {% endif %}
+
+                        <!-- Quick Actions -->
+                        <div class="d-grid gap-2">
+                            <a href="{% url 'courses:course_discussions' course.slug %}" class="btn btn-outline-primary btn-sm">
+                                <i class="fas fa-comments me-2"></i>Discussions
+                            </a>
+                            {% if not enrollment.user_review %}
+                            <a href="{% url 'courses:add_review' course.slug %}" class="btn btn-outline-warning btn-sm">
+                                <i class="fas fa-star me-2"></i>Write a Review
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Course Content -->
+            <div class="col-lg-8">
+                {% if messages %}
+                    {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                    {% endfor %}
+                {% endif %}
+
+                <div class="card shadow-sm">
+                    <div class="card-header bg-white">
+                        <h4 class="mb-0 fw-bold">Course Curriculum</h4>
+                    </div>
+                    <div class="card-body p-0">
+                        {% if sections %}
+                            <div class="accordion" id="courseAccordion">
+                                {% for section in sections %}
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header" id="heading{{ section.id }}">
+                                        <button class="accordion-button {% if not forloop.first %}collapsed{% endif %}" type="button"
+                                                data-bs-toggle="collapse" data-bs-target="#collapse{{ section.id }}">
+                                            <div class="d-flex justify-content-between align-items-center w-100 me-3">
+                                                <div>
+                                                    <i class="fas fa-folder me-2 text-primary"></i>
+                                                    <strong>{{ section.title }}</strong>
+                                                </div>
+                                                <span class="badge bg-secondary">{{ section.lessons.count }} lessons</span>
+                                            </div>
+                                        </button>
+                                    </h2>
+                                    <div id="collapse{{ section.id }}"
+                                         class="accordion-collapse collapse {% if forloop.first %}show{% endif %}"
+                                         data-bs-parent="#courseAccordion">
+                                        <div class="accordion-body p-0">
+                                            <div class="list-group list-group-flush">
+                                                {% for lesson in section.lessons.all %}
+                                                <a href="{% url 'courses:lesson_view' course.slug lesson.id %}"
+                                                   class="list-group-item list-group-item-action">
+                                                    <div class="d-flex justify-content-between align-items-start">
+                                                        <div class="flex-grow-1">
+                                                            <div class="d-flex align-items-center">
+                                                                {% if lesson.content_type == 'video' %}
+                                                                    <i class="fas fa-play-circle me-2 text-primary"></i>
+                                                                {% elif lesson.content_type == 'article' %}
+                                                                    <i class="fas fa-file-alt me-2 text-info"></i>
+                                                                {% else %}
+                                                                    <i class="fas fa-question-circle me-2 text-warning"></i>
+                                                                {% endif %}
+                                                                <span>{{ lesson.title }}</span>
+                                                                {% if lesson.is_preview %}
+                                                                    <span class="badge bg-info ms-2">Preview</span>
+                                                                {% endif %}
+                                                            </div>
+                                                            {% if lesson.description %}
+                                                            <p class="text-muted small mb-0 ms-4 mt-1">{{ lesson.description|truncatewords:15 }}</p>
+                                                            {% endif %}
+                                                        </div>
+                                                        <div class="text-end ms-3">
+                                                            {% if lesson.duration_minutes %}
+                                                            <small class="text-muted d-block">{{ lesson.duration_minutes }} min</small>
+                                                            {% endif %}
+                                                            {% with lesson.is_completed_by|add:request.user.id as is_completed %}
+                                                                {% if lesson.lessonprogress_set.filter|add:request.user as progress %}
+                                                                    {% if progress.first.completed %}
+                                                                    <i class="fas fa-check-circle text-success"></i>
+                                                                    {% endif %}
+                                                                {% endif %}
+                                                            {% endwith %}
+                                                        </div>
+                                                    </div>
+                                                </a>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="alert alert-info m-4">
+                                <i class="fas fa-info-circle me-2"></i>
+                                No content has been added to this course yet.
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

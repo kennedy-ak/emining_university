@@ -1,0 +1,225 @@
+{% extends 'custom_admin/base.html' %}
+
+{% block title %}Course: {{ course.title }}{% endblock %}
+{% block page_title %}Course Details{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-4">
+        <div class="card-custom mb-4">
+            <div class="card-header">
+                <i class="fas fa-book"></i> Course Information
+            </div>
+            <div class="card-body">
+                {% if course.image %}
+                <img src="{{ course.image.url }}" alt="{{ course.title }}" class="img-fluid rounded mb-3">
+                {% endif %}
+
+                <h5>{{ course.title }}</h5>
+                <p class="text-muted">{{ course.category.name }}</p>
+
+                <hr>
+
+                <p><strong>Instructor:</strong> {{ course.instructor.full_name }}</p>
+                <p><strong>Level:</strong> <span class="badge bg-secondary">{{ course.get_level_display }}</span></p>
+                <p><strong>Price:</strong> {{ course.currency }} {{ course.price }}</p>
+                <p><strong>Students:</strong> {{ total_students }}</p>
+                <p><strong>Completed:</strong> {{ completed_students }} ({{ completion_rate }}%)</p>
+                <p><strong>Average Rating:</strong>
+                    {% if course.avg_rating %}
+                    <span class="text-warning">
+                        <i class="fas fa-star"></i> {{ course.avg_rating|floatformat:1 }}
+                    </span>
+                    {% else %}
+                    <span class="text-muted">No ratings</span>
+                    {% endif %}
+                </p>
+                <p><strong>Revenue:</strong>
+                    {% if course.revenue %}
+                    <span class="text-success">GH₵{{ course.revenue|floatformat:2 }}</span>
+                    {% else %}
+                    <span class="text-muted">GH₵0.00</span>
+                    {% endif %}
+                </p>
+                <p><strong>Created:</strong> {{ course.created_at|date:"M d, Y" }}</p>
+
+                <hr>
+
+                <form method="post" action="{% url 'courses:admin_toggle_course_featured' course.id %}">
+                    {% csrf_token %}
+                    {% if course.is_featured %}
+                    <button type="submit" class="btn btn-warning w-100 btn-custom">
+                        <i class="fas fa-star"></i> Unfeature Course
+                    </button>
+                    {% else %}
+                    <button type="submit" class="btn btn-success w-100 btn-custom">
+                        <i class="fas fa-star"></i> Feature Course
+                    </button>
+                    {% endif %}
+                </form>
+
+                <a href="{% url 'courses:admin_edit_course' course.id %}" class="btn btn-primary w-100 btn-custom mt-2">
+                    <i class="fas fa-edit"></i> Edit Course
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        <!-- Course Content -->
+        <div class="card-custom mb-4">
+            <div class="card-header">
+                <i class="fas fa-list"></i> Course Content ({{ sections.count }} Sections)
+            </div>
+            <div class="card-body">
+                {% for section in sections %}
+                <div class="mb-3">
+                    <h6><i class="fas fa-folder"></i> {{ forloop.counter }}. {{ section.title }}</h6>
+                    <ul class="list-group">
+                        {% for lesson in section.lessons.all %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span>
+                                {% if lesson.content_type == 'video' %}
+                                <i class="fas fa-video text-primary"></i>
+                                {% elif lesson.content_type == 'article' %}
+                                <i class="fas fa-file-alt text-success"></i>
+                                {% else %}
+                                <i class="fas fa-question-circle text-warning"></i>
+                                {% endif %}
+                                {{ lesson.title }}
+                                {% if lesson.is_preview %}
+                                <span class="badge bg-info ms-2">Preview</span>
+                                {% endif %}
+                            </span>
+                            <span class="text-muted">
+                                {% if lesson.duration %}{{ lesson.duration }} min{% endif %}
+                            </span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% empty %}
+                <p class="text-center text-muted">No content available</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Recent Enrollments -->
+        <div class="card-custom mb-4">
+            <div class="card-header">
+                <i class="fas fa-user-graduate"></i> Recent Enrollments
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-custom">
+                        <thead>
+                            <tr>
+                                <th>Student</th>
+                                <th>Progress</th>
+                                <th>Status</th>
+                                <th>Enrolled</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for enrollment in enrollments %}
+                            <tr>
+                                <td>
+                                    <a href="{% url 'courses:admin_user_detail' enrollment.student.id %}" class="text-decoration-none">
+                                        {{ enrollment.student.username }}
+                                    </a>
+                                </td>
+                                <td>
+                                    <div class="progress" style="height: 20px; width: 150px;">
+                                        <div class="progress-bar" role="progressbar" style="width: {{ enrollment.progress_percentage }}%">
+                                            {{ enrollment.progress_percentage|floatformat:0 }}%
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    {% if enrollment.completed %}
+                                    <span class="badge bg-success">Completed</span>
+                                    {% else %}
+                                    <span class="badge bg-primary">In Progress</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ enrollment.enrolled_at|date:"M d, Y" }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center text-muted">No enrollments yet</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reviews and Discussions -->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card-custom mb-4">
+                    <div class="card-header">
+                        <i class="fas fa-star"></i> Recent Reviews
+                    </div>
+                    <div class="card-body">
+                        {% for review in reviews %}
+                        <div class="mb-3 pb-3 border-bottom">
+                            <div class="d-flex justify-content-between">
+                                <strong>{{ review.student.username }}</strong>
+                                <span class="text-warning">
+                                    {% for i in "12345" %}
+                                        {% if forloop.counter <= review.rating %}
+                                            <i class="fas fa-star"></i>
+                                        {% else %}
+                                            <i class="far fa-star"></i>
+                                        {% endif %}
+                                    {% endfor %}
+                                </span>
+                            </div>
+                            <p class="mb-1 mt-2">{{ review.comment|truncatewords:15 }}</p>
+                            <small class="text-muted">{{ review.created_at|date:"M d, Y" }}</small>
+                        </div>
+                        {% empty %}
+                        <p class="text-center text-muted">No reviews yet</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card-custom mb-4">
+                    <div class="card-header">
+                        <i class="fas fa-comments"></i> Recent Discussions
+                    </div>
+                    <div class="card-body">
+                        {% for discussion in discussions %}
+                        <div class="mb-3 pb-3 border-bottom">
+                            <strong>{{ discussion.title }}</strong>
+                            <p class="mb-1 mt-2 text-muted">
+                                by {{ discussion.author.username }}
+                                {% if discussion.is_pinned %}
+                                <span class="badge bg-warning">Pinned</span>
+                                {% endif %}
+                                {% if discussion.is_resolved %}
+                                <span class="badge bg-success">Resolved</span>
+                                {% endif %}
+                            </p>
+                            <small class="text-muted">{{ discussion.created_at|date:"M d, Y" }}</small>
+                        </div>
+                        {% empty %}
+                        <p class="text-center text-muted">No discussions yet</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="mt-3">
+    <a href="{% url 'courses:admin_courses_list' %}" class="btn btn-secondary btn-custom">
+        <i class="fas fa-arrow-left"></i> Back to Courses
+    </a>
+</div>
+{% endblock %}

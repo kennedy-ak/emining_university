@@ -1,0 +1,190 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Dashboard - E-miningCampus{% endblock %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="fw-bold">Welcome, {{ user.get_full_name|default:user.username }}!</h1>
+            <a href="{% url 'courses:profile' %}" class="btn btn-outline-primary">
+                <i class="fas fa-user me-2"></i>Edit Profile
+            </a>
+        </div>
+
+        {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endfor %}
+        {% endif %}
+
+        <!-- Statistics Cards -->
+        <div class="row g-4 mb-5">
+            <div class="col-md-3">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-book fa-3x text-primary mb-3"></i>
+                        <h3 class="fw-bold">{{ enrollments.count }}</h3>
+                        <p class="text-muted mb-0">Enrolled Courses</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+                        <h3 class="fw-bold">{{ completed_courses }}</h3>
+                        <p class="text-muted mb-0">Completed</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-certificate fa-3x text-warning mb-3"></i>
+                        <h3 class="fw-bold">{{ certificates.count }}</h3>
+                        <p class="text-muted mb-0">Certificates</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-clock fa-3x text-info mb-3"></i>
+                        <h3 class="fw-bold">{{ total_hours }}</h3>
+                        <p class="text-muted mb-0">Hours Learned</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- My Courses -->
+        <div class="mb-5">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3 class="fw-bold">My Courses</h3>
+                <a href="{% url 'courses:courses_list' %}" class="btn btn-primary">
+                    <i class="fas fa-plus me-2"></i>Browse Courses
+                </a>
+            </div>
+
+            {% if enrollments %}
+                <div class="row g-4">
+                    {% for enrollment in enrollments %}
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card shadow-sm h-100">
+                            {% if enrollment.course.image %}
+                                <img src="{{ enrollment.course.image.url }}" class="card-img-top" alt="{{ enrollment.course.title }}" style="height: 200px; object-fit: cover;">
+                            {% else %}
+                                <div class="bg-primary text-white d-flex align-items-center justify-content-center" style="height: 200px;">
+                                    <i class="fas fa-book fa-4x opacity-50"></i>
+                                </div>
+                            {% endif %}
+                            <div class="card-body">
+                                <h5 class="card-title">{{ enrollment.course.title }}</h5>
+                                <p class="text-muted small mb-2">
+                                    <i class="fas fa-user me-1"></i>{{ enrollment.course.instructor.full_name }}
+                                </p>
+
+                                <!-- Progress Bar -->
+                                <div class="mb-3">
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <small class="text-muted">Progress</small>
+                                        <small class="fw-bold">{{ enrollment.progress_percentage }}%</small>
+                                    </div>
+                                    <div class="progress" style="height: 8px;">
+                                        <div class="progress-bar bg-success" role="progressbar" style="width: {{ enrollment.progress_percentage }}%"></div>
+                                    </div>
+                                </div>
+
+                                {% if enrollment.completed %}
+                                    <span class="badge bg-success mb-2">
+                                        <i class="fas fa-check me-1"></i>Completed
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-primary mb-2">
+                                        <i class="fas fa-clock me-1"></i>In Progress
+                                    </span>
+                                {% endif %}
+
+                                <div class="mt-3">
+                                    <a href="{% url 'courses:course_content' enrollment.course.slug %}" class="btn btn-primary btn-sm w-100">
+                                        <i class="fas fa-play me-1"></i>Continue Learning
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    You haven't enrolled in any courses yet. <a href="{% url 'courses:courses_list' %}" class="alert-link">Browse our courses</a> to get started!
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Recent Activity -->
+        {% if recent_progress %}
+        <div class="mb-5">
+            <h3 class="fw-bold mb-4">Recent Activity</h3>
+            <div class="card shadow-sm">
+                <div class="list-group list-group-flush">
+                    {% for progress in recent_progress %}
+                    <div class="list-group-item">
+                        <div class="d-flex w-100 justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-1">{{ progress.lesson.title }}</h6>
+                                <small class="text-muted">{{ progress.lesson.section.course.title }}</small>
+                            </div>
+                            <div>
+                                {% if progress.completed %}
+                                    <span class="badge bg-success">Completed</span>
+                                {% else %}
+                                    <span class="badge bg-warning">Viewing</span>
+                                {% endif %}
+                                <small class="text-muted ms-2">{{ progress.last_viewed|timesince }} ago</small>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Certificates -->
+        {% if certificates %}
+        <div>
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3 class="fw-bold">My Certificates</h3>
+                <a href="{% url 'courses:my_certificates' %}" class="btn btn-outline-primary btn-sm">View All</a>
+            </div>
+            <div class="row g-4">
+                {% for certificate in certificates|slice:":3" %}
+                <div class="col-md-4">
+                    <div class="card shadow-sm">
+                        <div class="card-body text-center">
+                            <i class="fas fa-certificate fa-4x text-warning mb-3"></i>
+                            <h6 class="fw-bold">{{ certificate.course.title }}</h6>
+                            <p class="text-muted small mb-3">Issued: {{ certificate.issued_at|date:"M d, Y" }}</p>
+                            <a href="{% url 'courses:download_certificate' certificate.certificate_id %}" class="btn btn-sm btn-primary">
+                                <i class="fas fa-download me-1"></i>Download
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

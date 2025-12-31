@@ -1,0 +1,281 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}All Courses - E-miningCampus{% endblock %}
+
+{% block extra_css %}
+<style>
+    .courses-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 3rem 0;
+        margin-bottom: 3rem;
+    }
+    .courses-header h1 {
+        font-size: 2.5rem;
+        font-weight: bold;
+        margin: 0;
+    }
+    .filter-section {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        margin-bottom: 2rem;
+    }
+    .course-card {
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        transition: all 0.3s;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        border: none;
+    }
+    .course-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    }
+    .course-image {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+    }
+    .course-body {
+        padding: 1.5rem;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+    .level-badge {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        margin-bottom: 0.75rem;
+        background: #e3f2fd;
+        color: #1976d2;
+    }
+    .course-title {
+        font-size: 1.15rem;
+        font-weight: 600;
+        color: #212529;
+        margin-bottom: 1rem;
+        line-height: 1.4;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        min-height: 2.8em;
+    }
+    .course-title a {
+        color: inherit;
+        text-decoration: none;
+    }
+    .course-title a:hover {
+        color: #667eea;
+    }
+    .course-rating {
+        color: #ffc107;
+        font-size: 0.9rem;
+        margin-bottom: 0.75rem;
+    }
+    .course-meta {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1rem;
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
+    .course-meta i {
+        margin-right: 0.25rem;
+    }
+    .instructor-info {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 0.5rem;
+    }
+    .instructor-avatar {
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+    .instructor-avatar-placeholder {
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        background: #667eea;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 0.9rem;
+    }
+    .instructor-name {
+        font-size: 0.9rem;
+        color: #495057;
+        margin: 0;
+    }
+    .category-tag {
+        font-size: 0.85rem;
+        color: #6c757d;
+    }
+    .course-footer {
+        padding: 1rem 1.5rem;
+        border-top: 1px solid #f1f3f5;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: auto;
+    }
+    .course-price {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #212529;
+        margin: 0;
+    }
+    .btn-view-details {
+        background: transparent;
+        border: 2px solid #667eea;
+        color: #667eea;
+        padding: 0.5rem 1.25rem;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: all 0.3s;
+        text-decoration: none;
+        display: inline-block;
+    }
+    .btn-view-details:hover {
+        background: #667eea;
+        color: white;
+    }
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+    }
+    .empty-state i {
+        font-size: 4rem;
+        color: #dee2e6;
+        margin-bottom: 1rem;
+    }
+    .empty-state h3 {
+        color: #6c757d;
+        margin-bottom: 0.5rem;
+    }
+    .empty-state p {
+        color: #adb5bd;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<section class="courses-header">
+    <div class="container">
+        <h1 class="text-center">All Courses</h1>
+        <p class="text-center mb-0 opacity-75">Explore our comprehensive collection of mining courses</p>
+    </div>
+</section>
+
+<!-- Main Content -->
+<section class="pb-5">
+    <div class="container">
+        <!-- Courses Grid -->
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            {% for course in courses %}
+            <div class="col">
+                <div class="card course-card">
+                    <!-- Course Image -->
+                    <a href="{% url 'courses:course_detail' course.slug %}">
+                        {% if course.image %}
+                        <img src="{{ course.image.url }}" class="course-image" alt="{{ course.title }}">
+                        {% else %}
+                        <img src="{% static 'images/default-course.jpg' %}" class="course-image" alt="{{ course.title }}">
+                        {% endif %}
+                    </a>
+
+                    <div class="course-body">
+                        <!-- Level Badge -->
+                        <span class="level-badge">{{ course.get_level_display }}</span>
+
+                        <!-- Course Rating -->
+                        <div class="course-rating">
+                            {% with avg_rating=course.avg_rating|default:0 %}
+                                {% for i in "12345" %}
+                                    {% if forloop.counter <= avg_rating %}
+                                        <i class="fas fa-star"></i>
+                                    {% elif forloop.counter == avg_rating|add:"1" and avg_rating|floatformat:0 != avg_rating %}
+                                        <i class="fas fa-star-half-alt"></i>
+                                    {% else %}
+                                        <i class="far fa-star"></i>
+                                    {% endif %}
+                                {% endfor %}
+                            {% endwith %}
+                        </div>
+
+                        <!-- Course Title -->
+                        <h5 class="course-title">
+                            <a href="{% url 'courses:course_detail' course.slug %}">{{ course.title }}</a>
+                        </h5>
+
+                        <!-- Course Meta -->
+                        <div class="course-meta">
+                            <span>
+                                <i class="fas fa-user-graduate"></i>
+                                {{ course.enrollment_count|default:0 }}
+                            </span>
+                            <span>
+                                <i class="fas fa-clock"></i>
+                                20h
+                            </span>
+                        </div>
+
+                        <!-- Instructor Info -->
+                        <div class="instructor-info">
+                            {% if course.instructor.profile_image %}
+                            <img src="{{ course.instructor.profile_image.url }}"
+                                 class="instructor-avatar"
+                                 alt="{{ course.instructor.full_name }}">
+                            {% else %}
+                            <div class="instructor-avatar-placeholder">
+                                {{ course.instructor.full_name|slice:":2"|upper }}
+                            </div>
+                            {% endif %}
+                            <div>
+                                <p class="instructor-name mb-0">By {{ course.instructor.full_name }}</p>
+                                {% if course.category %}
+                                <small class="category-tag">In {{ course.category.name }}</small>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Course Footer -->
+                    <div class="course-footer">
+                        <div class="course-price">{{ course.currency }}{{ course.price }}</div>
+                        <a href="{% url 'courses:course_detail' course.slug %}" class="btn-view-details">
+                            View Details
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12">
+                <div class="empty-state">
+                    <i class="fas fa-book-open"></i>
+                    <h3>No Courses Available</h3>
+                    <p>Check back soon for new courses!</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

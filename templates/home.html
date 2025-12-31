@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Home - E-miningCampus{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section bg-primary text-white py-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <span class="badge bg-light text-primary mb-3">Getting Started</span>
+                <h1 class="display-4 fw-bold mb-4">A broad selection of courses</h1>
+                <p class="lead mb-4">
+                    "Welcome to the Mining Certificate Program! Dive into an array of expert-led courses designed to improve your knowledge and abilities in the mining company operations. Whether you want to develop your profession or obtain new skills, our program provides flexible learning options to help you reach your objectives. Begin your road towards becoming a mining professional today!"
+                </p>
+                <div class="d-flex gap-3">
+                    <a href="{% url 'courses:courses_list' %}" class="btn btn-light btn-lg">Explore Courses</a>
+                    <a href="#" class="btn btn-outline-light btn-lg">Start Learning</a>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <img src="{% static 'images/hero-image.jpg' %}" alt="Mining Education" class="img-fluid rounded">
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- About Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <img src="{% static 'images/about-image.jpg' %}" alt="E-miningCampus" class="img-fluid rounded shadow">
+            </div>
+            <div class="col-lg-6">
+                <h2 class="fw-bold mb-4">Welcome to E-miningCampus</h2>
+                <p>
+                    Welcome to E-miningCampus, your premier online learning platform for mining engineering education and training. We are a team of experienced lecturers from the Department of Mining Engineering, University of Mines and Technology (UMaT), Tarkwa, Ghana, with a passion for sharing our knowledge and expertise with the global mining community.
+                </p>
+                <p>
+                    Established in June 2024, E-miningCampus is a response to the growing demand for flexible and accessible mining education and training. Our platform offers a range of online courses, expresso certificates, proficiency certificates and professional certificate programs in mining engineering, designed to equip learners with the skills and competencies required to succeed in the industry.
+                </p>
+                <a href="{% url 'courses:about' %}" class="btn btn-primary">Read More</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Featured Courses Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold">FEATURED COURSES</h2>
+            <p class="text-muted">Learning often happens in classrooms but it doesn't have to be so. Use Foundation to facilitate learning</p>
+        </div>
+        
+        <div class="row g-4">
+            {% for course in featured_courses %}
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 shadow-sm course-card">
+                    {% if course.image %}
+                    <img src="{{ course.image.url }}" class="card-img-top" alt="{{ course.title }}">
+                    {% else %}
+                    <img src="{% static 'images/default-course.jpg' %}" class="card-img-top" alt="{{ course.title }}">
+                    {% endif %}
+                    <div class="card-body">
+                        <span class="badge bg-info text-dark mb-2">{{ course.get_level_display }}</span>
+                        <h5 class="card-title">{{ course.title }}</h5>
+                        <div class="d-flex align-items-center mb-2">
+                            <img src="{% if course.instructor.profile_image %}{{ course.instructor.profile_image.url }}{% else %}{% static 'images/default-avatar.png' %}{% endif %}" 
+                                 alt="{{ course.instructor.full_name }}" 
+                                 class="rounded-circle me-2" 
+                                 width="30" 
+                                 height="30">
+                            <small class="text-muted">By {{ course.instructor.full_name }}</small>
+                        </div>
+                        {% if course.category %}
+                        <small class="text-muted">In {{ course.category.name }}</small>
+                        {% endif %}
+                    </div>
+                    <div class="card-footer bg-white border-top-0">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0 text-primary">{{ course.currency }}{{ course.price }}</h5>
+                            <a href="{% url 'courses:course_detail' course.slug %}" class="btn btn-outline-primary btn-sm">View Details</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12 text-center">
+                <p class="text-muted">No featured courses available at the moment.</p>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <div class="text-center mt-5">
+            <a href="{% url 'courses:courses_list' %}" class="btn btn-primary btn-lg">Explore Courses</a>
+        </div>
+    </div>
+</section>
+
+<!-- Stats Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row text-center">
+            <div class="col-md-3">
+                <div class="p-4">
+                    <i class="fas fa-certificate fa-3x text-primary mb-3"></i>
+                    <h3 class="fw-bold">0</h3>
+                    <p class="text-muted">Certificates</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="p-4">
+                    <i class="fas fa-chalkboard-teacher fa-3x text-primary mb-3"></i>
+                    <h3 class="fw-bold">{{ total_instructors }}</h3>
+                    <p class="text-muted">Instructors</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="p-4">
+                    <i class="fas fa-clock fa-3x text-primary mb-3"></i>
+                    <h3 class="fw-bold">0</h3>
+                    <p class="text-muted">Hours of Courses</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="p-4">
+                    <i class="fas fa-book fa-3x text-primary mb-3"></i>
+                    <h3 class="fw-bold">{{ total_courses }}</h3>
+                    <p class="text-muted">Courses Published</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

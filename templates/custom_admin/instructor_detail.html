@@ -1,0 +1,125 @@
+{% extends 'custom_admin/base.html' %}
+
+{% block title %}Instructor: {{ instructor.full_name }}{% endblock %}
+{% block page_title %}Instructor Details{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-4">
+        <div class="card-custom">
+            <div class="card-header">
+                <i class="fas fa-chalkboard-teacher"></i> Instructor Information
+            </div>
+            <div class="card-body text-center">
+                {% if instructor.profile_picture %}
+                <img src="{{ instructor.profile_picture.url }}" alt="{{ instructor.full_name }}" class="rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover;">
+                {% else %}
+                <div class="rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" style="width: 150px; height: 150px; background: #667eea; color: white; font-weight: bold; font-size: 4rem;">
+                    {{ instructor.full_name|slice:":1"|upper }}
+                </div>
+                {% endif %}
+
+                <h4>{{ instructor.full_name }}</h4>
+                <p class="text-muted">{{ instructor.title|default:"Instructor" }}</p>
+                <p class="text-muted">{{ instructor.user.email }}</p>
+
+                <hr>
+
+                <div class="row text-center">
+                    <div class="col-md-4">
+                        <h3>{{ instructor.course_count }}</h3>
+                        <small class="text-muted">Courses</small>
+                    </div>
+                    <div class="col-md-4">
+                        <h3>{{ instructor.student_count }}</h3>
+                        <small class="text-muted">Students</small>
+                    </div>
+                    <div class="col-md-4">
+                        <h3>{{ instructor.avg_rating|floatformat:1|default:"N/A" }}</h3>
+                        <small class="text-muted">Avg Rating</small>
+                    </div>
+                </div>
+
+                <hr>
+
+                {% if instructor.bio %}
+                <div class="text-start">
+                    <h6>Bio</h6>
+                    <p>{{ instructor.bio }}</p>
+                </div>
+                {% endif %}
+
+                <hr>
+
+                <a href="/admin/courses/instructor/{{ instructor.id }}/change/" target="_blank" class="btn btn-primary w-100 btn-custom">
+                    <i class="fas fa-edit"></i> Edit Instructor
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        <div class="card-custom">
+            <div class="card-header">
+                <i class="fas fa-book"></i> Courses ({{ courses.count }})
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-custom">
+                        <thead>
+                            <tr>
+                                <th>Course</th>
+                                <th>Level</th>
+                                <th>Students</th>
+                                <th>Avg Rating</th>
+                                <th>Featured</th>
+                                <th>Created</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for course in courses %}
+                            <tr>
+                                <td>
+                                    <a href="{% url 'courses:admin_course_detail' course.id %}" class="text-decoration-none">
+                                        {{ course.title }}
+                                    </a>
+                                </td>
+                                <td><span class="badge bg-secondary">{{ course.get_level_display }}</span></td>
+                                <td><span class="badge bg-primary">{{ course.enrollment_count }}</span></td>
+                                <td>
+                                    {% if course.avg_rating %}
+                                    <span class="text-warning">
+                                        <i class="fas fa-star"></i> {{ course.avg_rating|floatformat:1 }}
+                                    </span>
+                                    {% else %}
+                                    <span class="text-muted">N/A</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if course.is_featured %}
+                                    <span class="badge bg-success">Yes</span>
+                                    {% else %}
+                                    <span class="badge bg-secondary">No</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ course.created_at|date:"M d, Y" }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="6" class="text-center text-muted">No courses yet</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="mt-3">
+    <a href="{% url 'courses:admin_instructors_list' %}" class="btn btn-secondary btn-custom">
+        <i class="fas fa-arrow-left"></i> Back to Instructors
+    </a>
+</div>
+{% endblock %}

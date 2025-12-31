@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}{% if editing %}Edit Review{% else %}Add Review{% endif %} - {{ course.title }}{% endblock %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <!-- Breadcrumb -->
+                <nav aria-label="breadcrumb" class="mb-4">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">
+                            <a href="{% url 'courses:courses_list' %}">Courses</a>
+                        </li>
+                        <li class="breadcrumb-item">
+                            <a href="{% url 'courses:course_detail' course.slug %}">{{ course.title|truncatewords:3 }}</a>
+                        </li>
+                        <li class="breadcrumb-item active">{% if editing %}Edit Review{% else %}Add Review{% endif %}</li>
+                    </ol>
+                </nav>
+
+                <div class="card shadow-sm">
+                    <div class="card-body p-4">
+                        <h3 class="fw-bold mb-4">
+                            <i class="fas fa-star text-warning me-2"></i>
+                            {% if editing %}Edit Your Review{% else %}Write a Review{% endif %}
+                        </h3>
+
+                        <!-- Course Info -->
+                        <div class="alert alert-light border mb-4">
+                            <div class="d-flex align-items-center">
+                                {% if course.image %}
+                                <img src="{{ course.image.url }}" alt="{{ course.title }}" class="rounded me-3" style="width: 80px; height: 80px; object-fit: cover;">
+                                {% else %}
+                                <div class="bg-primary text-white rounded me-3 d-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+                                    <i class="fas fa-book fa-2x"></i>
+                                </div>
+                                {% endif %}
+                                <div>
+                                    <h5 class="mb-1">{{ course.title }}</h5>
+                                    <p class="text-muted small mb-0">
+                                        <i class="fas fa-user me-1"></i>{{ course.instructor.full_name }}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Review Form -->
+                        <form method="post">
+                            {% csrf_token %}
+
+                            <div class="mb-4">
+                                <label for="id_rating" class="form-label fw-bold">Rating *</label>
+                                <div class="rating-input">
+                                    {{ form.rating }}
+                                </div>
+                                {% if form.rating.errors %}
+                                <div class="text-danger small mt-1">{{ form.rating.errors }}</div>
+                                {% endif %}
+                                <small class="text-muted">Select a rating from 1 to 5 stars</small>
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="id_comment" class="form-label fw-bold">Your Review *</label>
+                                {{ form.comment }}
+                                {% if form.comment.errors %}
+                                <div class="text-danger small mt-1">{{ form.comment.errors }}</div>
+                                {% endif %}
+                                <small class="text-muted">Share your experience with this course (minimum 20 characters)</small>
+                            </div>
+
+                            <!-- Form Actions -->
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-paper-plane me-2"></i>
+                                    {% if editing %}Update Review{% else %}Submit Review{% endif %}
+                                </button>
+                                <a href="{% url 'courses:course_detail' course.slug %}" class="btn btn-outline-secondary">
+                                    <i class="fas fa-times me-2"></i>Cancel
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Review Guidelines -->
+                <div class="card shadow-sm mt-4">
+                    <div class="card-body">
+                        <h6 class="fw-bold mb-3">
+                            <i class="fas fa-lightbulb text-warning me-2"></i>Review Guidelines
+                        </h6>
+                        <ul class="small text-muted mb-0">
+                            <li>Be honest and constructive in your feedback</li>
+                            <li>Focus on the course content, instructor, and learning experience</li>
+                            <li>Provide specific examples when possible</li>
+                            <li>Keep your review professional and respectful</li>
+                            <li>Avoid offensive language or personal attacks</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% if messages %}
+<div class="position-fixed top-0 end-0 p-3" style="z-index: 11">
+    {% for message in messages %}
+    <div class="toast show align-items-center text-white bg-{{ message.tags }} border-0" role="alert">
+        <div class="d-flex">
+            <div class="toast-body">{{ message }}</div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    #id_rating {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+    }
+    #id_comment {
+        width: 100%;
+        min-height: 150px;
+        padding: 10px;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        font-family: inherit;
+    }
+    #id_comment:focus, #id_rating:focus {
+        border-color: #0d6efd;
+        outline: 0;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    }
+</style>
+{% endblock %}

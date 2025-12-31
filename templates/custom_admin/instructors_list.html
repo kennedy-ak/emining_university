@@ -1,0 +1,126 @@
+{% extends 'custom_admin/base.html' %}
+
+{% block title %}Instructors Management{% endblock %}
+{% block page_title %}Instructors Management{% endblock %}
+
+{% block content %}
+<!-- Filter Section -->
+<div class="filter-section">
+    <form method="get" class="row g-3">
+        <div class="col-md-6">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" name="search" class="form-control" placeholder="Search instructors..." value="{{ search_query }}">
+            </div>
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-primary w-100 btn-custom">
+                <i class="fas fa-search"></i> Search
+            </button>
+        </div>
+        <div class="col-md-4 text-end">
+            <span class="badge bg-info p-2" style="font-size: 1rem;">
+                Total Instructors: {{ total_instructors }}
+            </span>
+        </div>
+    </form>
+</div>
+
+<!-- Instructors Table -->
+<div class="card-custom">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span><i class="fas fa-chalkboard-teacher"></i> Instructors List</span>
+        <a href="{% url 'courses:admin_create_instructor' %}" class="btn btn-sm btn-success btn-custom">
+            <i class="fas fa-plus-circle"></i> Create New Instructor
+        </a>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-custom mb-0">
+                <thead>
+                    <tr>
+                        <th>Instructor</th>
+                        <th>Email</th>
+                        <th>Courses</th>
+                        <th>Total Students</th>
+                        <th>Avg Rating</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for instructor in instructors %}
+                    <tr>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                {% if instructor.profile_picture %}
+                                <img src="{{ instructor.profile_picture.url }}" alt="{{ instructor.full_name }}" class="rounded-circle me-2" style="width: 50px; height: 50px; object-fit: cover;">
+                                {% else %}
+                                <div class="rounded-circle me-2 d-flex align-items-center justify-content-center" style="width: 50px; height: 50px; background: #667eea; color: white; font-weight: bold;">
+                                    {{ instructor.full_name|slice:":1"|upper }}
+                                </div>
+                                {% endif %}
+                                <div>
+                                    <strong>{{ instructor.full_name }}</strong>
+                                    <br><small class="text-muted">{{ instructor.title|default:"Instructor" }}</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td>{{ instructor.user.email }}</td>
+                        <td><span class="badge bg-primary">{{ instructor.course_count }} courses</span></td>
+                        <td><span class="badge bg-success">{{ instructor.student_count }} students</span></td>
+                        <td>
+                            {% if instructor.avg_rating %}
+                            <span class="text-warning">
+                                <i class="fas fa-star"></i> {{ instructor.avg_rating|floatformat:1 }}
+                            </span>
+                            {% else %}
+                            <span class="text-muted">N/A</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{% url 'courses:admin_instructor_detail' instructor.id %}" class="btn btn-sm btn-outline-primary btn-custom">
+                                <i class="fas fa-eye"></i> View
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center text-muted py-4">
+                            <i class="fas fa-chalkboard-teacher fa-3x mb-3 d-block"></i>
+                            No instructors found
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Pagination -->
+{% if instructors.has_other_pages %}
+<nav aria-label="Page navigation" class="mt-4">
+    <ul class="pagination justify-content-center">
+        {% if instructors.has_previous %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ instructors.previous_page_number }}&search={{ search_query }}">
+                <i class="fas fa-chevron-left"></i> Previous
+            </a>
+        </li>
+        {% endif %}
+
+        <li class="page-item active">
+            <span class="page-link">Page {{ instructors.number }} of {{ instructors.paginator.num_pages }}</span>
+        </li>
+
+        {% if instructors.has_next %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ instructors.next_page_number }}&search={{ search_query }}">
+                Next <i class="fas fa-chevron-right"></i>
+            </a>
+        </li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}
+{% endblock %}

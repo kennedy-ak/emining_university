@@ -1,0 +1,97 @@
+{% extends 'custom_admin/base.html' %}
+
+{% block title %}Enrollment Details{% endblock %}
+{% block page_title %}Enrollment Details{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-4">
+        <div class="card-custom">
+            <div class="card-header">
+                <i class="fas fa-info-circle"></i> Enrollment Information
+            </div>
+            <div class="card-body">
+                <p><strong>Student:</strong>
+                    <a href="{% url 'courses:admin_user_detail' enrollment.student.id %}">
+                        {{ enrollment.student.username }}
+                    </a>
+                </p>
+                <p><strong>Course:</strong>
+                    <a href="{% url 'courses:admin_course_detail' enrollment.course.id %}">
+                        {{ enrollment.course.title }}
+                    </a>
+                </p>
+                <p><strong>Enrolled:</strong> {{ enrollment.enrolled_at|date:"M d, Y H:i" }}</p>
+                <p><strong>Progress:</strong></p>
+                <div class="progress mb-2" style="height: 30px;">
+                    <div class="progress-bar {% if enrollment.progress_percentage == 100 %}bg-success{% endif %}" role="progressbar" style="width: {{ enrollment.progress_percentage }}%">
+                        {{ enrollment.progress_percentage|floatformat:0 }}%
+                    </div>
+                </div>
+                <p><strong>Status:</strong>
+                    {% if enrollment.completed %}
+                    <span class="badge bg-success">Completed</span>
+                    {% else %}
+                    <span class="badge bg-primary">In Progress</span>
+                    {% endif %}
+                </p>
+                {% if enrollment.completed_at %}
+                <p><strong>Completed:</strong> {{ enrollment.completed_at|date:"M d, Y H:i" }}</p>
+                {% endif %}
+
+                <hr>
+
+                <a href="{% url 'courses:admin_enrollments_list' %}" class="btn btn-secondary w-100 btn-custom">
+                    <i class="fas fa-arrow-left"></i> Back to Enrollments
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        <div class="card-custom">
+            <div class="card-header">
+                <i class="fas fa-tasks"></i> Lesson Progress
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-custom">
+                        <thead>
+                            <tr>
+                                <th>Lesson</th>
+                                <th>Status</th>
+                                <th>Last Viewed</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for progress in lesson_progress %}
+                            <tr>
+                                <td>{{ progress.lesson.title }}</td>
+                                <td>
+                                    {% if progress.completed %}
+                                    <span class="badge bg-success"><i class="fas fa-check"></i> Completed</span>
+                                    {% else %}
+                                    <span class="badge bg-secondary">Not Completed</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if progress.last_viewed %}
+                                    {{ progress.last_viewed|date:"M d, Y H:i" }}
+                                    {% else %}
+                                    <span class="text-muted">Never</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="3" class="text-center text-muted">No lesson progress tracked</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

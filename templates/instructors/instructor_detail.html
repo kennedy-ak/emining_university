@@ -1,0 +1,399 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ instructor.full_name }} - Instructor - E-miningCampus{% endblock %}
+
+{% block extra_css %}
+<style>
+    .instructor-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 4rem 0 3rem;
+        position: relative;
+        overflow: hidden;
+    }
+    .instructor-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -10%;
+        width: 120%;
+        height: 200%;
+        background: repeating-linear-gradient(
+            45deg,
+            transparent,
+            transparent 10px,
+            rgba(255, 255, 255, 0.03) 10px,
+            rgba(255, 255, 255, 0.03) 20px
+        );
+        animation: slide 20s linear infinite;
+    }
+    @keyframes slide {
+        0% { transform: translateX(0); }
+        100% { transform: translateX(50px); }
+    }
+    .instructor-avatar-wrapper {
+        position: relative;
+        z-index: 2;
+    }
+    .instructor-avatar {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        border: 5px solid white;
+        object-fit: cover;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        background: white;
+    }
+    .instructor-avatar-placeholder {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        border: 5px solid white;
+        background: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3rem;
+        color: #667eea;
+        font-weight: bold;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    }
+    .instructor-info {
+        position: relative;
+        z-index: 2;
+    }
+    .instructor-name {
+        font-size: 2.5rem;
+        font-weight: bold;
+        margin: 0;
+    }
+    .instructor-stats {
+        font-size: 1.1rem;
+        opacity: 0.9;
+    }
+    .instructor-rating {
+        position: absolute;
+        top: 2rem;
+        right: 2rem;
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        padding: 1rem 1.5rem;
+        border-radius: 10px;
+        text-align: center;
+    }
+    .rating-stars {
+        color: #ffc107;
+        font-size: 1.2rem;
+        margin-bottom: 0.5rem;
+    }
+    .rating-value {
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin: 0;
+    }
+    .rating-count {
+        font-size: 0.9rem;
+        opacity: 0.8;
+    }
+    .bio-section {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        margin-bottom: 2rem;
+    }
+    .bio-section h3 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        color: #212529;
+    }
+    .bio-text {
+        color: #6c757d;
+        line-height: 1.8;
+    }
+    .courses-section h3 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        color: #212529;
+    }
+    .course-card {
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        transition: all 0.3s;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+    .course-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    }
+    .course-image {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+    }
+    .course-body {
+        padding: 1.5rem;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+    .course-rating {
+        color: #ffc107;
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+    }
+    .course-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #212529;
+        margin-bottom: 1rem;
+        line-height: 1.4;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    .course-title a {
+        color: inherit;
+        text-decoration: none;
+    }
+    .course-title a:hover {
+        color: #667eea;
+    }
+    .course-meta {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1rem;
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
+    .course-meta i {
+        margin-right: 0.25rem;
+    }
+    .instructor-badge {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.75rem;
+        background: #f8f9fa;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+    }
+    .instructor-badge-avatar {
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        background: #667eea;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 0.9rem;
+    }
+    .instructor-badge-info {
+        flex: 1;
+    }
+    .instructor-badge-name {
+        font-weight: 600;
+        font-size: 0.9rem;
+        color: #212529;
+        margin: 0;
+    }
+    .instructor-badge-role {
+        font-size: 0.8rem;
+        color: #6c757d;
+        margin: 0;
+    }
+    .course-footer {
+        padding: 1rem 1.5rem;
+        border-top: 1px solid #f1f3f5;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: auto;
+    }
+    .course-price {
+        font-size: 1.3rem;
+        font-weight: bold;
+        color: #212529;
+    }
+    .btn-add-to-cart {
+        background: transparent;
+        border: 2px solid #667eea;
+        color: #667eea;
+        padding: 0.5rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: all 0.3s;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .btn-add-to-cart:hover {
+        background: #667eea;
+        color: white;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Instructor Header -->
+<section class="instructor-header">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-auto">
+                <div class="instructor-avatar-wrapper">
+                    {% if instructor.profile_image %}
+                    <img src="{{ instructor.profile_image.url }}" class="instructor-avatar" alt="{{ instructor.full_name }}">
+                    {% else %}
+                    <div class="instructor-avatar-placeholder">
+                        {{ instructor.full_name|slice:":2"|upper }}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col">
+                <div class="instructor-info">
+                    <h1 class="instructor-name">{{ instructor.full_name }}</h1>
+                    <p class="instructor-stats mb-0">
+                        {{ course_count }} Course{{ course_count|pluralize }} • {{ total_students }} Student{{ total_students|pluralize }}
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Rating Badge -->
+        <div class="instructor-rating d-none d-md-block">
+            <div class="rating-stars">
+                {% for i in "12345" %}
+                    {% if forloop.counter <= avg_rating %}
+                        <i class="fas fa-star"></i>
+                    {% elif forloop.counter == avg_rating|add:"1" and avg_rating|floatformat:0 != avg_rating %}
+                        <i class="fas fa-star-half-alt"></i>
+                    {% else %}
+                        <i class="far fa-star"></i>
+                    {% endif %}
+                {% endfor %}
+            </div>
+            <p class="rating-value">{{ avg_rating|floatformat:2 }}</p>
+            <p class="rating-count mb-0">({{ total_reviews }})</p>
+        </div>
+    </div>
+</section>
+
+<!-- Main Content -->
+<section class="py-5">
+    <div class="container">
+        <!-- Biography Section -->
+        <div class="bio-section">
+            <h3>Biography</h3>
+            {% if instructor.bio %}
+            <p class="bio-text">{{ instructor.bio|linebreaks }}</p>
+            {% else %}
+            <p class="bio-text text-muted">Bio data is empty</p>
+            {% endif %}
+        </div>
+
+        <!-- Courses Section -->
+        <div class="courses-section">
+            <h3>Courses</h3>
+            {% if courses %}
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                {% for course in courses %}
+                <div class="col">
+                    <div class="course-card">
+                        <!-- Course Image -->
+                        <a href="{% url 'courses:course_detail' course.slug %}">
+                            {% if course.image %}
+                            <img src="{{ course.image.url }}" class="course-image" alt="{{ course.title }}">
+                            {% else %}
+                            <img src="{% static 'images/default-course.jpg' %}" class="course-image" alt="{{ course.title }}">
+                            {% endif %}
+                        </a>
+
+                        <div class="course-body">
+                            <!-- Rating -->
+                            <div class="course-rating">
+                                {% for i in "12345" %}
+                                    {% if forloop.counter <= course.avg_rating|default:0 %}
+                                        <i class="fas fa-star"></i>
+                                    {% elif forloop.counter == course.avg_rating|default:0|add:"1" and course.avg_rating|default:0|floatformat:0 != course.avg_rating|default:0 %}
+                                        <i class="fas fa-star-half-alt"></i>
+                                    {% else %}
+                                        <i class="far fa-star"></i>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+
+                            <!-- Course Title -->
+                            <h5 class="course-title">
+                                <a href="{% url 'courses:course_detail' course.slug %}">{{ course.title }}</a>
+                            </h5>
+
+                            <!-- Course Meta -->
+                            <div class="course-meta">
+                                <span>
+                                    <i class="fas fa-user-graduate"></i>
+                                    {{ course.enrollment_count }}
+                                </span>
+                                {% if course.sections.all %}
+                                <span>
+                                    <i class="fas fa-clock"></i>
+                                    {% with total_duration=0 %}
+                                        {% for section in course.sections.all %}
+                                            {% for lesson in section.lessons.all %}
+                                                {% if forloop.first %}
+                                                    {{ lesson.duration_minutes }}h
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% endfor %}
+                                    {% endwith %}
+                                    20h
+                                </span>
+                                {% endif %}
+                            </div>
+
+                            <!-- Instructor Badge -->
+                            <div class="instructor-badge">
+                                <div class="instructor-badge-avatar">
+                                    {{ course.instructor.full_name|slice:":2"|upper }}
+                                </div>
+                                <div class="instructor-badge-info">
+                                    <p class="instructor-badge-name">By {{ course.instructor.full_name }}</p>
+                                    <p class="instructor-badge-role">In {{ course.category.name|default:"Professional Certificate" }}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Course Footer -->
+                        <div class="course-footer">
+                            <div class="course-price">{{ course.currency }}{{ course.price }}</div>
+                            <form method="post" action="{% url 'courses:add_to_cart' course.id %}" style="margin: 0;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn-add-to-cart">
+                                    <i class="fas fa-shopping-cart"></i>
+                                    Add to cart
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="text-muted">This instructor hasn't created any courses yet.</p>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %}

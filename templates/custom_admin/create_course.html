@@ -1,0 +1,440 @@
+{% extends 'custom_admin/base.html' %}
+{% load static %}
+
+{% block title %}Create New Course - Admin{% endblock %}
+
+{% block extra_css %}
+<style>
+    .section-card {
+        background: white;
+        border: 2px solid #e9ecef;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid #f8f9fa;
+    }
+    .lesson-card {
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+    .lesson-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.75rem;
+    }
+    .btn-remove {
+        background: #dc3545;
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        cursor: pointer;
+    }
+    .btn-remove:hover {
+        background: #c82333;
+    }
+    .btn-add {
+        background: #28a745;
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        cursor: pointer;
+    }
+    .btn-add:hover {
+        background: #218838;
+    }
+    .form-section {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    .form-section h3 {
+        color: #667eea;
+        margin-bottom: 1.5rem;
+        font-weight: 600;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>{% if editing %}Edit Course{% else %}Create New Course (All-in-One){% endif %}</h2>
+                <a href="{% url 'courses:admin_courses_list' %}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to Courses
+                </a>
+            </div>
+
+            <form method="post" enctype="multipart/form-data" id="courseForm">
+                {% csrf_token %}
+
+                <!-- Course Basic Information -->
+                <div class="form-section">
+                    <h3><i class="fas fa-book"></i> Course Information</h3>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="id_title" class="form-label">Title *</label>
+                            {{ form.title }}
+                            {% if form.title.errors %}
+                                <div class="text-danger">{{ form.title.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="id_slug" class="form-label">Slug *</label>
+                            {{ form.slug }}
+                            {% if form.slug.errors %}
+                                <div class="text-danger">{{ form.slug.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="id_description" class="form-label">Description *</label>
+                        {{ form.description }}
+                        {% if form.description.errors %}
+                            <div class="text-danger">{{ form.description.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label for="id_instructor" class="form-label">Instructor *</label>
+                            {{ form.instructor }}
+                            {% if form.instructor.errors %}
+                                <div class="text-danger">{{ form.instructor.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="id_category" class="form-label">Category</label>
+                            {{ form.category }}
+                            {% if form.category.errors %}
+                                <div class="text-danger">{{ form.category.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="id_level" class="form-label">Level *</label>
+                            {{ form.level }}
+                            {% if form.level.errors %}
+                                <div class="text-danger">{{ form.level.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label for="id_price" class="form-label">Price *</label>
+                            {{ form.price }}
+                            {% if form.price.errors %}
+                                <div class="text-danger">{{ form.price.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="id_currency" class="form-label">Currency *</label>
+                            {{ form.currency }}
+                            {% if form.currency.errors %}
+                                <div class="text-danger">{{ form.currency.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="id_image" class="form-label">Course Image</label>
+                            {{ form.image }}
+                            {% if form.image.errors %}
+                                <div class="text-danger">{{ form.image.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="mb-3 form-check">
+                        {{ form.is_featured }}
+                        <label for="id_is_featured" class="form-check-label">Featured Course</label>
+                    </div>
+                </div>
+
+                <!-- Course Details -->
+                <div class="form-section">
+                    <h3><i class="fas fa-info-circle"></i> Course Details</h3>
+
+                    <div class="mb-3">
+                        <label for="id_what_you_will_learn" class="form-label">What You Will Learn</label>
+                        {{ form.what_you_will_learn }}
+                        <small class="form-text text-muted">{{ form.what_you_will_learn.help_text }}</small>
+                        {% if form.what_you_will_learn.errors %}
+                            <div class="text-danger">{{ form.what_you_will_learn.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="id_requirements" class="form-label">Requirements</label>
+                        {{ form.requirements }}
+                        <small class="form-text text-muted">{{ form.requirements.help_text }}</small>
+                        {% if form.requirements.errors %}
+                            <div class="text-danger">{{ form.requirements.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="id_target_audience" class="form-label">Target Audience</label>
+                        {{ form.target_audience }}
+                        <small class="form-text text-muted">{{ form.target_audience.help_text }}</small>
+                        {% if form.target_audience.errors %}
+                            <div class="text-danger">{{ form.target_audience.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="id_tags" class="form-label">Tags</label>
+                        {{ form.tags }}
+                        <small class="form-text text-muted">{{ form.tags.help_text }}</small>
+                        {% if form.tags.errors %}
+                            <div class="text-danger">{{ form.tags.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Sections and Lessons -->
+                <div class="form-section">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h3><i class="fas fa-list"></i> Course Content (Sections & Lessons)</h3>
+                        <button type="button" class="btn-add" onclick="addSection()">
+                            <i class="fas fa-plus"></i> Add Section
+                        </button>
+                    </div>
+
+                    <div id="sectionsContainer"></div>
+                </div>
+
+                <!-- Hidden field to store sections data -->
+                <input type="hidden" name="sections_data" id="sectionsData" value="[]">
+
+                <!-- Submit Button -->
+                <div class="text-end">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="fas fa-save"></i> {% if editing %}Update Course{% else %}Create Course{% endif %}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let sectionCount = 0;
+
+// Auto-generate slug from title
+document.getElementById('id_title').addEventListener('input', function() {
+    const slug = this.value.toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-|-$/g, '');
+    document.getElementById('id_slug').value = slug;
+});
+
+function addSection() {
+    sectionCount++;
+    const container = document.getElementById('sectionsContainer');
+
+    const sectionHtml = `
+        <div class="section-card" id="section-${sectionCount}" data-section-id="${sectionCount}">
+            <div class="section-header">
+                <h4><i class="fas fa-folder"></i> Section ${sectionCount}</h4>
+                <button type="button" class="btn-remove" onclick="removeSection(${sectionCount})">
+                    <i class="fas fa-trash"></i> Remove Section
+                </button>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label class="form-label">Section Title *</label>
+                    <input type="text" class="form-control section-title" placeholder="e.g., Week 1: Introduction to Mining Geology" required>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Order</label>
+                    <input type="number" class="form-control section-order" value="${sectionCount}" min="0">
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Section Description</label>
+                <textarea class="form-control section-description" rows="2" placeholder="Optional description"></textarea>
+            </div>
+
+            <div class="mb-3">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h5>Lessons</h5>
+                    <button type="button" class="btn-add btn-sm" onclick="addLesson(${sectionCount})">
+                        <i class="fas fa-plus"></i> Add Lesson
+                    </button>
+                </div>
+                <div class="lessons-container" id="lessons-${sectionCount}"></div>
+            </div>
+        </div>
+    `;
+
+    container.insertAdjacentHTML('beforeend', sectionHtml);
+}
+
+let lessonCounters = {};
+
+function addLesson(sectionId) {
+    if (!lessonCounters[sectionId]) {
+        lessonCounters[sectionId] = 0;
+    }
+    lessonCounters[sectionId]++;
+
+    const lessonId = `${sectionId}-${lessonCounters[sectionId]}`;
+    const container = document.getElementById(`lessons-${sectionId}`);
+
+    const lessonHtml = `
+        <div class="lesson-card" id="lesson-${lessonId}" data-lesson-id="${lessonId}">
+            <div class="lesson-header">
+                <h6><i class="fas fa-play-circle"></i> Lesson ${lessonCounters[sectionId]}</h6>
+                <button type="button" class="btn-remove btn-sm" onclick="removeLesson('${lessonId}')">
+                    <i class="fas fa-trash"></i> Remove
+                </button>
+            </div>
+
+            <div class="row mb-2">
+                <div class="col-md-6">
+                    <label class="form-label">Lesson Title *</label>
+                    <input type="text" class="form-control lesson-title" placeholder="e.g., Overview of geology and mining" required>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Duration (minutes)</label>
+                    <input type="number" class="form-control lesson-duration" value="0" min="0">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Order</label>
+                    <input type="number" class="form-control lesson-order" value="${lessonCounters[sectionId]}" min="0">
+                </div>
+            </div>
+
+            <div class="row mb-2">
+                <div class="col-md-6">
+                    <label class="form-label">Content Type</label>
+                    <select class="form-control lesson-content-type">
+                        <option value="video">Video</option>
+                        <option value="article">Article</option>
+                        <option value="quiz">Quiz</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Video URL (YouTube)</label>
+                    <input type="url" class="form-control lesson-video-url" placeholder="https://youtube.com/watch?v=...">
+                </div>
+            </div>
+
+            <div class="mb-2">
+                <label class="form-label">Article Content</label>
+                <textarea class="form-control lesson-article" rows="2" placeholder="Article content (if applicable)"></textarea>
+            </div>
+
+            <div class="form-check">
+                <input type="checkbox" class="form-check-input lesson-preview" id="preview-${lessonId}">
+                <label class="form-check-label" for="preview-${lessonId}">Allow preview (viewable without enrollment)</label>
+            </div>
+        </div>
+    `;
+
+    container.insertAdjacentHTML('beforeend', lessonHtml);
+}
+
+function removeSection(sectionId) {
+    if (confirm('Are you sure you want to remove this section and all its lessons?')) {
+        document.getElementById(`section-${sectionId}`).remove();
+    }
+}
+
+function removeLesson(lessonId) {
+    if (confirm('Are you sure you want to remove this lesson?')) {
+        document.getElementById(`lesson-${lessonId}`).remove();
+    }
+}
+
+// Collect all sections and lessons data before form submission
+document.getElementById('courseForm').addEventListener('submit', function(e) {
+    const sectionsData = [];
+    const sectionCards = document.querySelectorAll('.section-card');
+
+    sectionCards.forEach((sectionCard, index) => {
+        const sectionData = {
+            title: sectionCard.querySelector('.section-title').value,
+            description: sectionCard.querySelector('.section-description').value,
+            order: parseInt(sectionCard.querySelector('.section-order').value) || index,
+            lessons: []
+        };
+
+        const lessonCards = sectionCard.querySelectorAll('.lesson-card');
+        lessonCards.forEach((lessonCard, lessonIndex) => {
+            const lessonData = {
+                title: lessonCard.querySelector('.lesson-title').value,
+                content_type: lessonCard.querySelector('.lesson-content-type').value,
+                video_url: lessonCard.querySelector('.lesson-video-url').value,
+                article_content: lessonCard.querySelector('.lesson-article').value,
+                duration_minutes: parseInt(lessonCard.querySelector('.lesson-duration').value) || 0,
+                order: parseInt(lessonCard.querySelector('.lesson-order').value) || lessonIndex,
+                is_preview: lessonCard.querySelector('.lesson-preview').checked
+            };
+            sectionData.lessons.push(lessonData);
+        });
+
+        sectionsData.push(sectionData);
+    });
+
+    document.getElementById('sectionsData').value = JSON.stringify(sectionsData);
+});
+
+// Load existing sections if editing
+window.addEventListener('DOMContentLoaded', function() {
+    {% if editing and existing_sections %}
+    const existingSections = {{ existing_sections|safe }};
+
+    existingSections.forEach((sectionData, index) => {
+        addSection();
+        const sectionCard = document.querySelectorAll('.section-card')[index];
+
+        // Populate section fields
+        sectionCard.querySelector('.section-title').value = sectionData.title || '';
+        sectionCard.querySelector('.section-description').value = sectionData.description || '';
+        sectionCard.querySelector('.section-order').value = sectionData.order || index + 1;
+
+        // Add and populate lessons
+        sectionData.lessons.forEach((lessonData, lessonIndex) => {
+            const sectionId = sectionCount;
+            addLesson(sectionId);
+
+            const lessonsContainer = sectionCard.querySelector('.lessons-container');
+            const lessonCard = lessonsContainer.querySelectorAll('.lesson-card')[lessonIndex];
+
+            lessonCard.querySelector('.lesson-title').value = lessonData.title || '';
+            lessonCard.querySelector('.lesson-duration').value = lessonData.duration_minutes || 0;
+            lessonCard.querySelector('.lesson-order').value = lessonData.order || lessonIndex + 1;
+            lessonCard.querySelector('.lesson-content-type').value = lessonData.content_type || 'video';
+            lessonCard.querySelector('.lesson-video-url').value = lessonData.video_url || '';
+            lessonCard.querySelector('.lesson-article').value = lessonData.article_content || '';
+            lessonCard.querySelector('.lesson-preview').checked = lessonData.is_preview || false;
+        });
+    });
+    {% else %}
+    // Add first section by default for new course
+    addSection();
+    {% endif %}
+});
+</script>
+{% endblock %}

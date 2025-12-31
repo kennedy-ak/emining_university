@@ -1,0 +1,228 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ lesson.title }} - {{ course.title }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .lesson-content {
+        background: #000;
+        aspect-ratio: 16/9;
+        width: 100%;
+    }
+    .lesson-sidebar {
+        max-height: calc(100vh - 100px);
+        overflow-y: auto;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="py-4 bg-light">
+    <div class="container-fluid">
+        <div class="row g-0">
+            <!-- Main Lesson Content -->
+            <div class="col-lg-9">
+                <div class="bg-white">
+                    <!-- Video Player or Content -->
+                    <div class="lesson-content position-relative">
+                        {% if lesson.content_type == 'video' and lesson.video_url %}
+                            {% if 'youtube.com' in lesson.video_url or 'youtu.be' in lesson.video_url %}
+                                <!-- Extract YouTube ID and embed -->
+                                {% if 'youtu.be' in lesson.video_url %}
+                                    {% with video_id=lesson.video_url|slice:"17:" %}
+                                        <iframe width="100%" height="100%"
+                                                src="https://www.youtube.com/embed/{{ video_id }}"
+                                                frameborder="0"
+                                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                                allowfullscreen>
+                                        </iframe>
+                                    {% endwith %}
+                                {% elif 'watch?v=' in lesson.video_url %}
+                                    {% with video_id=lesson.video_url|cut:"https://www.youtube.com/watch?v=" %}
+                                        <iframe width="100%" height="100%"
+                                                src="https://www.youtube.com/embed/{{ video_id|cut:"&" }}"
+                                                frameborder="0"
+                                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                                allowfullscreen>
+                                        </iframe>
+                                    {% endwith %}
+                                {% elif 'embed' in lesson.video_url %}
+                                    <iframe width="100%" height="100%"
+                                            src="{{ lesson.video_url }}"
+                                            frameborder="0"
+                                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                            allowfullscreen>
+                                    </iframe>
+                                {% endif %}
+                            {% else %}
+                                <video width="100%" height="100%" controls>
+                                    <source src="{{ lesson.video_url }}" type="video/mp4">
+                                    Your browser does not support the video tag.
+                                </video>
+                            {% endif %}
+                        {% elif lesson.content_type == 'article' %}
+                            <div class="d-flex align-items-center justify-content-center h-100 text-white">
+                                <div class="text-center">
+                                    <i class="fas fa-file-alt fa-5x mb-3"></i>
+                                    <p>Article Content</p>
+                                </div>
+                            </div>
+                        {% else %}
+                            <div class="d-flex align-items-center justify-content-center h-100 text-white">
+                                <div class="text-center">
+                                    <i class="fas fa-question-circle fa-5x mb-3"></i>
+                                    <p>Content not available</p>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Lesson Info -->
+                    <div class="p-4">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div>
+                                <h3 class="fw-bold mb-2">{{ lesson.title }}</h3>
+                                <p class="text-muted">
+                                    <a href="{% url 'courses:course_content' course.slug %}" class="text-decoration-none">
+                                        <i class="fas fa-arrow-left me-2"></i>{{ course.title }}
+                                    </a>
+                                </p>
+                            </div>
+                            {% if enrollment and progress %}
+                                {% if not progress.completed %}
+                                <form method="post" action="{% url 'courses:mark_lesson_complete' lesson.id %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-success">
+                                        <i class="fas fa-check me-2"></i>Mark as Complete
+                                    </button>
+                                </form>
+                                {% else %}
+                                <span class="badge bg-success fs-6 py-2 px-3">
+                                    <i class="fas fa-check-circle me-2"></i>Completed
+                                </span>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+
+                        <!-- Tabs for Description and Materials -->
+                        <ul class="nav nav-tabs mb-3" id="lessonTabs" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="overview-tab" data-bs-toggle="tab"
+                                        data-bs-target="#overview" type="button" role="tab">
+                                    <i class="fas fa-info-circle me-2"></i>Overview
+                                </button>
+                            </li>
+                            {% if materials %}
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="materials-tab" data-bs-toggle="tab"
+                                        data-bs-target="#materials" type="button" role="tab">
+                                    <i class="fas fa-file-download me-2"></i>Materials ({{ materials.count }})
+                                </button>
+                            </li>
+                            {% endif %}
+                        </ul>
+
+                        <div class="tab-content" id="lessonTabContent">
+                            <!-- Overview Tab -->
+                            <div class="tab-pane fade show active" id="overview" role="tabpanel">
+                                {% if lesson.description %}
+                                    <div class="mb-4">
+                                        <h5 class="fw-bold mb-3">About this lesson</h5>
+                                        <p class="text-muted">{{ lesson.description|linebreaks }}</p>
+                                    </div>
+                                {% endif %}
+
+                                {% if lesson.duration_minutes %}
+                                <p class="text-muted">
+                                    <i class="fas fa-clock me-2"></i>Duration: {{ lesson.duration_minutes }} minutes
+                                </p>
+                                {% endif %}
+                            </div>
+
+                            <!-- Materials Tab -->
+                            {% if materials %}
+                            <div class="tab-pane fade" id="materials" role="tabpanel">
+                                <h5 class="fw-bold mb-3">Downloadable Materials</h5>
+                                <div class="list-group">
+                                    {% for material in materials %}
+                                    <a href="{{ material.file.url }}" class="list-group-item list-group-item-action" download>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <i class="fas fa-file me-2 text-primary"></i>
+                                                <strong>{{ material.title }}</strong>
+                                                {% if material.description %}
+                                                <p class="text-muted small mb-0 ms-4">{{ material.description }}</p>
+                                                {% endif %}
+                                            </div>
+                                            <i class="fas fa-download text-muted"></i>
+                                        </div>
+                                    </a>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lesson Sidebar - Course Outline -->
+            <div class="col-lg-3 bg-white border-start">
+                <div class="lesson-sidebar p-3">
+                    <h6 class="fw-bold mb-3">Course Content</h6>
+
+                    <div class="accordion accordion-flush" id="sidebarAccordion">
+                        {% for section in sections %}
+                        <div class="accordion-item border-0">
+                            <h2 class="accordion-header" id="sidebar-heading{{ section.id }}">
+                                <button class="accordion-button collapsed p-2 bg-transparent" type="button"
+                                        data-bs-toggle="collapse" data-bs-target="#sidebar-collapse{{ section.id }}">
+                                    <small class="fw-bold">{{ section.title }}</small>
+                                </button>
+                            </h2>
+                            <div id="sidebar-collapse{{ section.id }}"
+                                 class="accordion-collapse collapse {% if section.id == lesson.section.id %}show{% endif %}"
+                                 data-bs-parent="#sidebarAccordion">
+                                <div class="accordion-body p-0">
+                                    <div class="list-group list-group-flush">
+                                        {% for lesson_item in section.lessons.all %}
+                                        <a href="{% url 'courses:lesson_view' course.slug lesson_item.id %}"
+                                           class="list-group-item list-group-item-action border-0 py-2 px-3 {% if lesson_item.id == lesson.id %}active{% endif %}">
+                                            <small class="d-flex align-items-center">
+                                                {% if lesson_item.content_type == 'video' %}
+                                                    <i class="fas fa-play-circle me-2"></i>
+                                                {% elif lesson_item.content_type == 'article' %}
+                                                    <i class="fas fa-file-alt me-2"></i>
+                                                {% else %}
+                                                    <i class="fas fa-question-circle me-2"></i>
+                                                {% endif %}
+                                                <span class="flex-grow-1">{{ lesson_item.title|truncatewords:5 }}</span>
+                                            </small>
+                                        </a>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% if messages %}
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+    {% for message in messages %}
+    <div class="toast show align-items-center text-white bg-{{ message.tags }} border-0" role="alert">
+        <div class="d-flex">
+            <div class="toast-body">{{ message }}</div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+{% endblock %}

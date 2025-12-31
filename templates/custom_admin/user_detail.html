@@ -1,0 +1,253 @@
+{% extends 'custom_admin/base.html' %}
+
+{% block title %}User: {{ user_obj.username }}{% endblock %}
+{% block page_title %}User Details: {{ user_obj.username }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- User Info Card -->
+    <div class="col-md-4">
+        <div class="card-custom">
+            <div class="card-header">
+                <i class="fas fa-user"></i> User Information
+            </div>
+            <div class="card-body text-center">
+                {% if user_obj.profile.profile_picture %}
+                <img src="{{ user_obj.profile.profile_picture.url }}" alt="{{ user_obj.username }}" class="rounded-circle mb-3" style="width: 120px; height: 120px; object-fit: cover;">
+                {% else %}
+                <div class="rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" style="width: 120px; height: 120px; background: #667eea; color: white; font-weight: bold; font-size: 3rem;">
+                    {{ user_obj.username|slice:":1"|upper }}
+                </div>
+                {% endif %}
+
+                <h4>{{ user_obj.username }}</h4>
+                {% if user_obj.first_name and user_obj.last_name %}
+                <p class="text-muted">{{ user_obj.first_name }} {{ user_obj.last_name }}</p>
+                {% endif %}
+                <p class="text-muted">{{ user_obj.email }}</p>
+
+                <div class="mb-3">
+                    {% if user_obj.is_superuser %}
+                    <span class="badge bg-danger">Superuser</span>
+                    {% elif user_obj.is_staff %}
+                    <span class="badge bg-warning">Staff</span>
+                    {% elif user_obj.is_active %}
+                    <span class="badge bg-success">Active</span>
+                    {% else %}
+                    <span class="badge bg-secondary">Inactive</span>
+                    {% endif %}
+                </div>
+
+                <hr>
+
+                <div class="text-start">
+                    <p><strong>Phone:</strong> {{ user_obj.profile.phone_number|default:"N/A" }}</p>
+                    <p><strong>Country:</strong> {{ user_obj.profile.country|default:"N/A" }}</p>
+                    <p><strong>City:</strong> {{ user_obj.profile.city|default:"N/A" }}</p>
+                    <p><strong>Date of Birth:</strong> {{ user_obj.profile.date_of_birth|default:"N/A" }}</p>
+                    <p><strong>Joined:</strong> {{ user_obj.date_joined|date:"M d, Y" }}</p>
+                    <p><strong>Last Login:</strong> {{ user_obj.last_login|date:"M d, Y H:i"|default:"Never" }}</p>
+                </div>
+
+                <hr>
+
+                <form method="post" action="{% url 'courses:admin_toggle_user_status' user_obj.id %}" class="d-inline">
+                    {% csrf_token %}
+                    {% if user_obj.is_active %}
+                    <button type="submit" class="btn btn-danger w-100" onclick="return confirm('Are you sure you want to deactivate this user?')">
+                        <i class="fas fa-ban"></i> Deactivate User
+                    </button>
+                    {% else %}
+                    <button type="submit" class="btn btn-success w-100" onclick="return confirm('Are you sure you want to activate this user?')">
+                        <i class="fas fa-check"></i> Activate User
+                    </button>
+                    {% endif %}
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Statistics -->
+    <div class="col-md-8">
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="stat-card">
+                    <div class="icon primary">
+                        <i class="fas fa-book"></i>
+                    </div>
+                    <h3>{{ enrollments.count }}</h3>
+                    <p>Enrollments</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-card">
+                    <div class="icon success">
+                        <i class="fas fa-dollar-sign"></i>
+                    </div>
+                    <h3>GH₵{{ total_spent|floatformat:2 }}</h3>
+                    <p>Total Spent</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-card">
+                    <div class="icon warning">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    <h3>{{ completion_rate }}%</h3>
+                    <p>Completion Rate</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Enrollments -->
+        <div class="card-custom mb-4">
+            <div class="card-header">
+                <i class="fas fa-book"></i> Enrollments ({{ enrollments.count }})
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-custom">
+                        <thead>
+                            <tr>
+                                <th>Course</th>
+                                <th>Progress</th>
+                                <th>Status</th>
+                                <th>Enrolled</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for enrollment in enrollments %}
+                            <tr>
+                                <td>{{ enrollment.course.title }}</td>
+                                <td>
+                                    <div class="progress" style="height: 20px;">
+                                        <div class="progress-bar" role="progressbar" style="width: {{ enrollment.progress_percentage }}%">
+                                            {{ enrollment.progress_percentage|floatformat:0 }}%
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    {% if enrollment.completed %}
+                                    <span class="badge bg-success">Completed</span>
+                                    {% else %}
+                                    <span class="badge bg-primary">In Progress</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ enrollment.enrolled_at|date:"M d, Y" }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center text-muted">No enrollments</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Orders -->
+        <div class="card-custom mb-4">
+            <div class="card-header">
+                <i class="fas fa-shopping-cart"></i> Orders ({{ orders.count }})
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-custom">
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for order in orders %}
+                            <tr>
+                                <td>
+                                    <a href="{% url 'courses:admin_order_detail' order.order_id %}" class="text-decoration-none">
+                                        {{ order.order_id }}
+                                    </a>
+                                </td>
+                                <td>GH₵{{ order.total_amount }}</td>
+                                <td>
+                                    <span class="badge {% if order.status == 'completed' %}bg-success{% elif order.status == 'pending' %}bg-warning{% elif order.status == 'failed' %}bg-danger{% else %}bg-secondary{% endif %}">
+                                        {{ order.status }}
+                                    </span>
+                                </td>
+                                <td>{{ order.created_at|date:"M d, Y" }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center text-muted">No orders</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reviews and Certificates -->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card-custom mb-4">
+                    <div class="card-header">
+                        <i class="fas fa-star"></i> Reviews ({{ reviews.count }})
+                    </div>
+                    <div class="card-body">
+                        {% for review in reviews %}
+                        <div class="mb-3 pb-3 border-bottom">
+                            <div class="d-flex justify-content-between">
+                                <strong>{{ review.course.title }}</strong>
+                                <span class="text-warning">
+                                    {% for i in "12345" %}
+                                        {% if forloop.counter <= review.rating %}
+                                            <i class="fas fa-star"></i>
+                                        {% else %}
+                                            <i class="far fa-star"></i>
+                                        {% endif %}
+                                    {% endfor %}
+                                </span>
+                            </div>
+                            <p class="mb-1 mt-2">{{ review.comment|truncatewords:20 }}</p>
+                            <small class="text-muted">{{ review.created_at|date:"M d, Y" }}</small>
+                        </div>
+                        {% empty %}
+                        <p class="text-center text-muted">No reviews</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card-custom mb-4">
+                    <div class="card-header">
+                        <i class="fas fa-certificate"></i> Certificates ({{ certificates.count }})
+                    </div>
+                    <div class="card-body">
+                        {% for certificate in certificates %}
+                        <div class="mb-3 pb-3 border-bottom">
+                            <strong>{{ certificate.course.title }}</strong>
+                            <p class="mb-1 mt-2">
+                                <code>{{ certificate.certificate_id }}</code>
+                            </p>
+                            <small class="text-muted">Issued: {{ certificate.issued_at|date:"M d, Y" }}</small>
+                        </div>
+                        {% empty %}
+                        <p class="text-center text-muted">No certificates</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="mt-3">
+    <a href="{% url 'courses:admin_users_list' %}" class="btn btn-secondary btn-custom">
+        <i class="fas fa-arrow-left"></i> Back to Users
+    </a>
+</div>
+{% endblock %}

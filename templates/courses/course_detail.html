@@ -1,0 +1,521 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ course.title }} - E-miningCampus{% endblock %}
+
+{% block extra_css %}
+<style>
+    .star-rating {
+        color: #ffc107;
+        font-size: 1.2rem;
+    }
+    .star-rating i {
+        margin-right: 2px;
+    }
+    .course-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 3rem 0;
+    }
+    .course-tabs {
+        border-bottom: 2px solid #e9ecef;
+        margin-bottom: 2rem;
+    }
+    .course-tabs .nav-link {
+        border: none;
+        color: #6c757d;
+        padding: 1rem 0;
+        margin-right: 2rem;
+        border-bottom: 3px solid transparent;
+        background: transparent;
+    }
+    .course-tabs .nav-link.active {
+        color: #667eea;
+        border-bottom-color: #667eea;
+        font-weight: 600;
+    }
+    .learning-outcomes ul, .requirements-list ul, .audience-list ul {
+        list-style: none;
+        padding-left: 0;
+    }
+    .learning-outcomes li, .requirements-list li, .audience-list li {
+        padding: 0.5rem 0;
+        position: relative;
+        padding-left: 2rem;
+    }
+    .learning-outcomes li:before {
+        content: "•";
+        position: absolute;
+        left: 0.5rem;
+        color: #667eea;
+        font-weight: bold;
+        font-size: 1.5rem;
+    }
+    .requirements-list li:before, .audience-list li:before {
+        content: "•";
+        position: absolute;
+        left: 0.5rem;
+        color: #6c757d;
+        font-weight: bold;
+        font-size: 1.5rem;
+    }
+    .section-header {
+        background: #f8f9fa;
+        padding: 1rem 1.5rem;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s;
+        border: 1px solid #e9ecef;
+        margin-bottom: 1rem;
+    }
+    .section-header:hover {
+        background: #e9ecef;
+    }
+    .section-header h5 {
+        margin: 0;
+        color: #667eea;
+        font-weight: 600;
+    }
+    .section-content {
+        padding-left: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    .lesson-item {
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid #f1f3f5;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .lesson-item:last-child {
+        border-bottom: none;
+    }
+    .lesson-info {
+        display: flex;
+        align-items: center;
+        flex: 1;
+    }
+    .lesson-icon {
+        color: #6c757d;
+        margin-right: 1rem;
+    }
+    .lesson-meta {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+    .lesson-duration {
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
+    .lesson-lock {
+        color: #6c757d;
+    }
+    .sticky-sidebar {
+        position: sticky;
+        top: 100px;
+    }
+    .price-box {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+        padding: 2rem;
+        margin-bottom: 1.5rem;
+    }
+    .price {
+        font-size: 2rem;
+        font-weight: bold;
+        color: #212529;
+    }
+    .btn-add-cart {
+        background: #667eea;
+        color: white;
+        border: none;
+        padding: 1rem;
+        width: 100%;
+        font-weight: 600;
+        border-radius: 8px;
+        transition: all 0.3s;
+    }
+    .btn-add-cart:hover {
+        background: #5568d3;
+        color: white;
+    }
+    .course-meta-item {
+        padding: 0.75rem 0;
+        display: flex;
+        align-items: center;
+        border-bottom: 1px solid #f1f3f5;
+    }
+    .course-meta-item:last-child {
+        border-bottom: none;
+    }
+    .course-meta-item i {
+        margin-right: 0.75rem;
+        color: #667eea;
+        width: 20px;
+    }
+    .instructor-box {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    .instructor-info {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+    .instructor-avatar {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+    .info-box {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    .info-box h6 {
+        font-weight: 600;
+        margin-bottom: 1rem;
+        color: #212529;
+    }
+    .tag-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+    .tag-item {
+        background: #f8f9fa;
+        border: 1px solid #e9ecef;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        color: #495057;
+    }
+    .wishlist-share {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+    }
+    .btn-icon {
+        background: transparent;
+        border: none;
+        color: white;
+        font-size: 1rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .btn-icon:hover {
+        color: #f8f9fa;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Course Header -->
+<section class="course-header">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8">
+                <!-- Star Rating -->
+                <div class="star-rating mb-3">
+                    {% for i in "12345" %}
+                        {% if forloop.counter <= average_rating %}
+                            <i class="fas fa-star"></i>
+                        {% elif forloop.counter == average_rating|add:"1" and average_rating|floatformat:0 != average_rating %}
+                            <i class="fas fa-star-half-alt"></i>
+                        {% else %}
+                            <i class="far fa-star"></i>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+
+                <!-- Course Title -->
+                <h1 class="fw-bold mb-3">{{ course.title }}</h1>
+
+                <!-- Category -->
+                <div class="mb-3">
+                    <span class="text-white-50">Categories:</span>
+                    {% if course.category %}
+                    <span class="badge bg-light text-dark ms-2">{{ course.category.name }}</span>
+                    {% endif %}
+                </div>
+
+                <!-- Wishlist and Share -->
+                <div class="wishlist-share">
+                    <button class="btn-icon">
+                        <i class="far fa-bookmark"></i>
+                        <span>Wishlist</span>
+                    </button>
+                    <button class="btn-icon">
+                        <i class="fas fa-share-alt"></i>
+                        <span>Share</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Main Content -->
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <!-- Left Column: Course Info -->
+            <div class="col-lg-8">
+                <!-- Course Image -->
+                {% if course.image %}
+                <img src="{{ course.image.url }}" class="img-fluid rounded mb-4" alt="{{ course.title }}">
+                {% else %}
+                <img src="{% static 'images/default-course.jpg' %}" class="img-fluid rounded mb-4" alt="{{ course.title }}">
+                {% endif %}
+
+                <!-- Tabs -->
+                <ul class="nav course-tabs" id="courseTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="info-tab" data-bs-toggle="tab" data-bs-target="#info" type="button" role="tab">
+                            Course Info
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="reviews-tab" data-bs-toggle="tab" data-bs-target="#reviews" type="button" role="tab">
+                            Reviews
+                        </button>
+                    </li>
+                </ul>
+
+                <!-- Tab Content -->
+                <div class="tab-content" id="courseTabContent">
+                    <!-- Course Info Tab -->
+                    <div class="tab-pane fade show active" id="info" role="tabpanel">
+                        <!-- What Will You Learn -->
+                        {% if course.what_you_will_learn %}
+                        <div class="learning-outcomes mb-5">
+                            <h4 class="fw-bold mb-3">What Will You Learn?</h4>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <ul>
+                                        {% for item in course.what_you_will_learn %}
+                                            {% if forloop.counter0|divisibleby:2 %}
+                                                <li>{{ item }}</li>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                                <div class="col-md-6">
+                                    <ul>
+                                        {% for item in course.what_you_will_learn %}
+                                            {% if not forloop.counter0|divisibleby:2 %}
+                                                <li>{{ item }}</li>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <!-- Course Content -->
+                        <div class="course-curriculum mb-5">
+                            <h4 class="fw-bold mb-3">Course Content</h4>
+                            {% for section in sections %}
+                            <div class="section-item">
+                                <div class="section-header" data-bs-toggle="collapse" data-bs-target="#section-{{ section.id }}">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <h5>{{ section.title }}</h5>
+                                        <i class="fas fa-chevron-down"></i>
+                                    </div>
+                                </div>
+                                <div class="collapse show section-content" id="section-{{ section.id }}">
+                                    {% for lesson in section.lessons.all %}
+                                    <div class="lesson-item">
+                                        <div class="lesson-info">
+                                            <i class="fas fa-play-circle lesson-icon"></i>
+                                            <span>{{ lesson.title }}</span>
+                                        </div>
+                                        <div class="lesson-meta">
+                                            <span class="lesson-duration">
+                                                {% if lesson.duration_minutes > 0 %}
+                                                    {{ lesson.duration_minutes|stringformat:"02d" }}:00
+                                                {% else %}
+                                                    00:00
+                                                {% endif %}
+                                            </span>
+                                            {% if not lesson.is_preview and not is_enrolled %}
+                                            <i class="fas fa-lock lesson-lock"></i>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Reviews Tab -->
+                    <div class="tab-pane fade" id="reviews" role="tabpanel">
+                        <h4 class="fw-bold mb-4">Student Reviews</h4>
+                        {% if reviews %}
+                            {% for review in reviews %}
+                            <div class="review-item mb-4 pb-4 border-bottom">
+                                <div class="d-flex align-items-start">
+                                    <img src="{% static 'images/default-avatar.png' %}"
+                                         class="rounded-circle me-3"
+                                         width="50"
+                                         height="50"
+                                         alt="{{ review.student.username }}">
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-1">{{ review.student.get_full_name|default:review.student.username }}</h6>
+                                        <div class="star-rating mb-2" style="font-size: 0.9rem;">
+                                            {% for i in "12345" %}
+                                                {% if i <= review.rating|stringformat:"s" %}
+                                                    <i class="fas fa-star"></i>
+                                                {% else %}
+                                                    <i class="far fa-star"></i>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </div>
+                                        <h6 class="mb-2">{{ review.title }}</h6>
+                                        <p class="text-muted mb-1">{{ review.comment }}</p>
+                                        <small class="text-muted">{{ review.created_at|date:"F d, Y" }}</small>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <p class="text-muted">No reviews yet. Be the first to review this course!</p>
+                        {% endif %}
+
+                        {% if is_enrolled and not user_review %}
+                        <div class="mt-4">
+                            <a href="{% url 'courses:add_review' course.slug %}" class="btn btn-primary">Write a Review</a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Sidebar -->
+            <div class="col-lg-4">
+                <div class="sticky-sidebar">
+                    <!-- Price Box -->
+                    <div class="price-box">
+                        <div class="price mb-3">{{ course.currency }}{{ course.price }}</div>
+
+                        {% if is_enrolled %}
+                            <a href="{% url 'courses:course_content' course.slug %}" class="btn btn-add-cart mb-2">
+                                Go to Course
+                            </a>
+                        {% elif in_cart %}
+                            <a href="{% url 'courses:cart' %}" class="btn btn-add-cart mb-2">
+                                View Cart
+                            </a>
+                        {% else %}
+                            <form method="post" action="{% url 'courses:add_to_cart' course.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-add-cart mb-2">Add to cart</button>
+                            </form>
+                        {% endif %}
+
+                        <hr>
+
+                        <!-- Course Meta Info -->
+                        <div class="course-meta-item">
+                            <i class="fas fa-signal"></i>
+                            <span>{{ course.get_level_display }}</span>
+                        </div>
+                        <div class="course-meta-item">
+                            <i class="fas fa-user-graduate"></i>
+                            <span>{{ enrollment_count }} Total Enrolled</span>
+                        </div>
+                        <div class="course-meta-item">
+                            <i class="fas fa-sync-alt"></i>
+                            <span>{{ course.updated_at|date:"F d, Y" }} Last Updated</span>
+                        </div>
+                    </div>
+
+                    <!-- Instructor Box -->
+                    <div class="instructor-box">
+                        <h6 class="mb-3">A course by</h6>
+                        <div class="instructor-info">
+                            {% if course.instructor.profile_image %}
+                            <img src="{{ course.instructor.profile_image.url }}" class="instructor-avatar" alt="{{ course.instructor.full_name }}">
+                            {% else %}
+                            <div class="instructor-avatar bg-primary text-white d-flex align-items-center justify-content-center">
+                                {{ course.instructor.full_name|slice:":2"|upper }}
+                            </div>
+                            {% endif %}
+                            <div>
+                                <h6 class="mb-0">{{ course.instructor.full_name }}</h6>
+                                <small class="text-muted">Instructor</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Requirements Box -->
+                    {% if course.requirements %}
+                    <div class="info-box">
+                        <h6>Requirements</h6>
+                        <div class="requirements-list">
+                            <ul>
+                                {% for req in course.requirements %}
+                                <li>{{ req }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Tags Box -->
+                    {% if course.tags %}
+                    <div class="info-box">
+                        <h6>Tags</h6>
+                        <div class="tag-list">
+                            {% for tag in course.tags %}
+                            <span class="tag-item">{{ tag }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Audience Box -->
+                    {% if course.target_audience %}
+                    <div class="info-box">
+                        <h6>Audience</h6>
+                        <div class="audience-list">
+                            <ul>
+                                {% for audience in course.target_audience %}
+                                <li>{{ audience }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Handle section collapse toggle icons
+    document.querySelectorAll('.section-header').forEach(header => {
+        header.addEventListener('click', function() {
+            const icon = this.querySelector('i');
+            icon.classList.toggle('fa-chevron-down');
+            icon.classList.toggle('fa-chevron-up');
+        });
+    });
+</script>
+{% endblock %}

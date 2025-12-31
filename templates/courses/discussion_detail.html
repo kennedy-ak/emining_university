@@ -1,0 +1,178 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}{{ discussion.title }} - Discussions{% endblock %}
+
+{% block content %}
+<section class="py-5 bg-light">
+    <div class="container">
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb" class="mb-4">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">
+                    <a href="{% url 'courses:courses_list' %}">Courses</a>
+                </li>
+                <li class="breadcrumb-item">
+                    <a href="{% url 'courses:course_detail' course.slug %}">{{ course.title|truncatewords:3 }}</a>
+                </li>
+                <li class="breadcrumb-item">
+                    <a href="{% url 'courses:course_discussions' course.slug %}">Discussions</a>
+                </li>
+                <li class="breadcrumb-item active">{{ discussion.title|truncatewords:3 }}</li>
+            </ol>
+        </nav>
+
+        {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endfor %}
+        {% endif %}
+
+        <div class="row">
+            <!-- Main Discussion -->
+            <div class="col-lg-8">
+                <!-- Original Post -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-body">
+                        <h3 class="fw-bold mb-3">{{ discussion.title }}</h3>
+
+                        <div class="d-flex align-items-center mb-3">
+                            <img src="{% if discussion.author.userprofile.profile_picture %}{{ discussion.author.userprofile.profile_picture.url }}{% else %}https://ui-avatars.com/api/?name={{ discussion.author.get_full_name|default:discussion.author.username }}&background=0D6EFD&color=fff{% endif %}"
+                                 alt="{{ discussion.author.get_full_name|default:discussion.author.username }}"
+                                 class="rounded-circle me-3"
+                                 style="width: 48px; height: 48px; object-fit: cover;">
+                            <div>
+                                <h6 class="mb-0 fw-bold">{{ discussion.author.get_full_name|default:discussion.author.username }}</h6>
+                                <small class="text-muted">
+                                    <i class="fas fa-clock me-1"></i>{{ discussion.created_at|timesince }} ago
+                                </small>
+                            </div>
+                        </div>
+
+                        <div class="discussion-content">
+                            <p class="mb-0">{{ discussion.content|linebreaks }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Replies Section -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-reply me-2"></i>
+                            Replies ({{ replies.count }})
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        {% if replies %}
+                            {% for reply in replies %}
+                            <div class="mb-4 {% if not forloop.last %}pb-4 border-bottom{% endif %}">
+                                <div class="d-flex align-items-start">
+                                    <img src="{% if reply.author.userprofile.profile_picture %}{{ reply.author.userprofile.profile_picture.url }}{% else %}https://ui-avatars.com/api/?name={{ reply.author.get_full_name|default:reply.author.username }}&background=28A745&color=fff{% endif %}"
+                                         alt="{{ reply.author.get_full_name|default:reply.author.username }}"
+                                         class="rounded-circle me-3"
+                                         style="width: 40px; height: 40px; object-fit: cover;">
+                                    <div class="flex-grow-1">
+                                        <div class="d-flex align-items-center mb-2">
+                                            <h6 class="mb-0 fw-bold me-2">
+                                                {{ reply.author.get_full_name|default:reply.author.username }}
+                                            </h6>
+                                            {% if reply.is_instructor_reply %}
+                                            <span class="badge bg-primary">Instructor</span>
+                                            {% endif %}
+                                        </div>
+                                        <small class="text-muted d-block mb-2">
+                                            <i class="fas fa-clock me-1"></i>{{ reply.created_at|timesince }} ago
+                                        </small>
+                                        <p class="mb-0">{{ reply.content|linebreaks }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="text-center text-muted py-4">
+                                <i class="fas fa-comments fa-3x mb-3"></i>
+                                <p>No replies yet. Be the first to respond!</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Reply Form -->
+                <div class="card shadow-sm">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-pen me-2"></i>
+                            Post a Reply
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="post">
+                            {% csrf_token %}
+
+                            <div class="mb-3">
+                                <label for="id_content" class="form-label fw-bold">Your Reply *</label>
+                                {{ form.content }}
+                                {% if form.content.errors %}
+                                <div class="text-danger small mt-1">{{ form.content.errors }}</div>
+                                {% endif %}
+                            </div>
+
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-paper-plane me-2"></i>Post Reply
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="col-lg-4">
+                <div class="card shadow-sm sticky-top" style="top: 20px;">
+                    <div class="card-body">
+                        <h6 class="fw-bold mb-3">Course</h6>
+                        {% if course.image %}
+                        <img src="{{ course.image.url }}" alt="{{ course.title }}" class="img-fluid rounded mb-3">
+                        {% endif %}
+                        <h6 class="mb-2">{{ course.title }}</h6>
+                        <p class="text-muted small mb-3">
+                            <i class="fas fa-user me-1"></i>{{ course.instructor.full_name }}
+                        </p>
+                        <hr>
+                        <div class="d-grid gap-2">
+                            <a href="{% url 'courses:course_discussions' course.slug %}" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-comments me-2"></i>All Discussions
+                            </a>
+                            <a href="{% url 'courses:course_content' course.slug %}" class="btn btn-sm btn-outline-secondary">
+                                <i class="fas fa-book me-2"></i>Course Content
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    #id_content {
+        width: 100%;
+        min-height: 120px;
+        padding: 10px;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        font-family: inherit;
+    }
+    #id_content:focus {
+        border-color: #0d6efd;
+        outline: 0;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    }
+</style>
+{% endblock %}

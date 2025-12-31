@@ -1,0 +1,165 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Certificates - E-miningCampus{% endblock %}
+
+{% block content %}
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2 class="fw-bold mb-2">
+                    <i class="fas fa-certificate text-warning me-2"></i>My Certificates
+                </h2>
+                <p class="text-muted mb-0">Your achievements and completed courses</p>
+            </div>
+            <a href="{% url 'courses:dashboard' %}" class="btn btn-outline-primary">
+                <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+            </a>
+        </div>
+
+        {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endfor %}
+        {% endif %}
+
+        {% if certificates %}
+        <div class="row g-4">
+            {% for certificate in certificates %}
+            <div class="col-md-6 col-lg-4">
+                <div class="card shadow-sm h-100 border-0">
+                    <!-- Certificate Badge -->
+                    <div class="card-body text-center position-relative">
+                        <div class="position-absolute top-0 end-0 m-3">
+                            <span class="badge bg-success">
+                                <i class="fas fa-check me-1"></i>Verified
+                            </span>
+                        </div>
+
+                        <!-- Certificate Icon -->
+                        <div class="mb-3 mt-3">
+                            <i class="fas fa-certificate fa-5x text-warning"></i>
+                        </div>
+
+                        <!-- Certificate Details -->
+                        <h5 class="fw-bold mb-2">{{ certificate.course.title }}</h5>
+                        <p class="text-muted small mb-2">
+                            <i class="fas fa-user me-1"></i>{{ certificate.course.instructor.full_name }}
+                        </p>
+
+                        <div class="mb-3">
+                            <p class="text-muted small mb-1">Issued on</p>
+                            <p class="fw-bold text-primary mb-1">{{ certificate.issued_at|date:"F d, Y" }}</p>
+                            <p class="text-muted small">Certificate ID: {{ certificate.certificate_id|truncatechars:15 }}</p>
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="d-grid gap-2">
+                            <a href="{% url 'courses:download_certificate' certificate.certificate_id %}"
+                               class="btn btn-primary" target="_blank">
+                                <i class="fas fa-download me-2"></i>Download PDF
+                            </a>
+                            <a href="{% url 'courses:verify_certificate' certificate.certificate_id %}"
+                               class="btn btn-outline-secondary btn-sm" target="_blank">
+                                <i class="fas fa-check-circle me-2"></i>Verify Certificate
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Certificate Footer -->
+                    <div class="card-footer bg-light border-0">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="text-muted">
+                                <i class="fas fa-shield-alt me-1"></i>Blockchain Secured
+                            </small>
+                            <button class="btn btn-sm btn-link text-muted"
+                                    onclick="navigator.clipboard.writeText('{{ certificate.certificate_id }}'); alert('Certificate ID copied!')">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Certificate Stats -->
+        <div class="row mt-5">
+            <div class="col-md-12">
+                <div class="card shadow-sm border-0">
+                    <div class="card-body">
+                        <h5 class="fw-bold mb-4">
+                            <i class="fas fa-chart-line me-2"></i>Your Learning Journey
+                        </h5>
+                        <div class="row text-center">
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <i class="fas fa-certificate fa-3x text-warning mb-2"></i>
+                                    <h3 class="fw-bold mb-0">{{ certificates.count }}</h3>
+                                    <p class="text-muted small mb-0">Certificate{{ certificates.count|pluralize }}</p>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <i class="fas fa-trophy fa-3x text-success mb-2"></i>
+                                    <h3 class="fw-bold mb-0">{{ certificates.count }}</h3>
+                                    <p class="text-muted small mb-0">Course{{ certificates.count|pluralize }} Completed</p>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <i class="fas fa-calendar fa-3x text-info mb-2"></i>
+                                    <h3 class="fw-bold mb-0">
+                                        {% if certificates.first %}
+                                            {{ certificates.first.issued_at|date:"M Y" }}
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </h3>
+                                    <p class="text-muted small mb-0">First Certificate</p>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <i class="fas fa-star fa-3x text-primary mb-2"></i>
+                                    <h3 class="fw-bold mb-0">
+                                        {% if certificates.last %}
+                                            {{ certificates.last.issued_at|date:"M Y" }}
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </h3>
+                                    <p class="text-muted small mb-0">Latest Certificate</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% else %}
+        <!-- No Certificates Yet -->
+        <div class="text-center py-5">
+            <div class="mb-4">
+                <i class="fas fa-certificate fa-5x text-muted"></i>
+            </div>
+            <h3 class="fw-bold mb-3">No Certificates Yet</h3>
+            <p class="text-muted mb-4">Complete a course to earn your first certificate!</p>
+            <div class="d-flex gap-2 justify-content-center">
+                <a href="{% url 'courses:dashboard' %}" class="btn btn-primary">
+                    <i class="fas fa-book me-2"></i>My Courses
+                </a>
+                <a href="{% url 'courses:courses_list' %}" class="btn btn-outline-primary">
+                    <i class="fas fa-search me-2"></i>Browse Courses
+                </a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

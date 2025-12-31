@@ -1,0 +1,172 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Verify Certificate - E-miningCampus{% endblock %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <!-- Verification Header -->
+                <div class="text-center mb-5">
+                    <div class="mb-4">
+                        {% if verified %}
+                        <i class="fas fa-check-circle fa-5x text-success"></i>
+                        {% else %}
+                        <i class="fas fa-times-circle fa-5x text-danger"></i>
+                        {% endif %}
+                    </div>
+                    <h2 class="fw-bold mb-2">Certificate Verification</h2>
+                    <p class="text-muted">Verify the authenticity of E-miningCampus certificates</p>
+                </div>
+
+                {% if verified and certificate %}
+                <!-- Certificate Details Card -->
+                <div class="card shadow-sm border-success border-2 mb-4">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-shield-alt me-2"></i>
+                            Certificate Verified
+                        </h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <!-- Certificate ID -->
+                        <div class="alert alert-light border mb-4">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <small class="text-muted d-block mb-1">Certificate ID</small>
+                                    <strong class="font-monospace">{{ certificate.certificate_id }}</strong>
+                                </div>
+                                <button class="btn btn-sm btn-outline-secondary"
+                                        onclick="navigator.clipboard.writeText('{{ certificate.certificate_id }}'); alert('Certificate ID copied!')">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Student Information -->
+                        <div class="row mb-4">
+                            <div class="col-md-6 mb-3">
+                                <label class="text-muted small d-block mb-1">Recipient</label>
+                                <h5 class="mb-0">{{ certificate.student.get_full_name|default:certificate.student.username }}</h5>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="text-muted small d-block mb-1">Email</label>
+                                <p class="mb-0">{{ certificate.student.email|truncatechars:30 }}</p>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <!-- Course Information -->
+                        <div class="mb-4">
+                            <label class="text-muted small d-block mb-2">Course Completed</label>
+                            <h4 class="fw-bold mb-2">{{ certificate.course.title }}</h4>
+                            <p class="text-muted mb-0">
+                                <i class="fas fa-user me-2"></i>Instructor: {{ certificate.course.instructor.full_name }}
+                            </p>
+                        </div>
+
+                        <hr>
+
+                        <!-- Issue Date -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="text-muted small d-block mb-1">Issue Date</label>
+                                <p class="mb-0 fw-bold">{{ certificate.issued_at|date:"F d, Y" }}</p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="text-muted small d-block mb-1">Status</label>
+                                <span class="badge bg-success fs-6">
+                                    <i class="fas fa-check-circle me-1"></i>Valid & Verified
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Download Button -->
+                        {% if user.is_authenticated and user == certificate.student %}
+                        <div class="d-grid gap-2 mt-4">
+                            <a href="{% url 'courses:download_certificate' certificate.certificate_id %}"
+                               class="btn btn-primary" target="_blank">
+                                <i class="fas fa-download me-2"></i>Download Certificate PDF
+                            </a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Verification Info -->
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h6 class="fw-bold mb-3">
+                            <i class="fas fa-info-circle text-primary me-2"></i>
+                            Verification Information
+                        </h6>
+                        <ul class="small text-muted mb-0">
+                            <li class="mb-2">This certificate was issued by E-miningCampus upon successful completion of the course.</li>
+                            <li class="mb-2">Each certificate has a unique ID that can be verified on this page.</li>
+                            <li class="mb-2">The certificate is cryptographically secured and cannot be forged.</li>
+                            <li class="mb-2">For any questions about this certificate, please contact us at support@eminingcampus.com</li>
+                        </ul>
+                    </div>
+                </div>
+
+                {% else %}
+                <!-- Certificate Not Found -->
+                <div class="card shadow-sm border-danger border-2">
+                    <div class="card-header bg-danger text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            Certificate Not Found
+                        </h5>
+                    </div>
+                    <div class="card-body text-center p-5">
+                        <i class="fas fa-times-circle fa-4x text-danger mb-4"></i>
+                        <h5 class="mb-3">Unable to Verify Certificate</h5>
+                        <p class="text-muted mb-4">
+                            The certificate ID you provided could not be found in our system.
+                            Please check the ID and try again.
+                        </p>
+
+                        <!-- Search Form -->
+                        <div class="row justify-content-center">
+                            <div class="col-md-8">
+                                <form method="get" action="{% url 'courses:verify_certificate' '00000000-0000-0000-0000-000000000000' %}">
+                                    <div class="input-group">
+                                        <input type="text"
+                                               class="form-control"
+                                               name="id"
+                                               placeholder="Enter Certificate ID"
+                                               required>
+                                        <button class="btn btn-primary" type="submit">
+                                            <i class="fas fa-search me-2"></i>Verify
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Back Button -->
+                <div class="text-center mt-4">
+                    <a href="{% url 'courses:home' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-home me-2"></i>Back to Home
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .font-monospace {
+        font-family: 'Courier New', monospace;
+        font-size: 0.9rem;
+    }
+</style>
+{% endblock %}

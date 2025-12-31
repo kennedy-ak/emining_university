@@ -1,0 +1,165 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Shopping Cart - E-miningCampus{% endblock %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <h2 class="fw-bold mb-4">
+            <i class="fas fa-shopping-cart me-2"></i>Shopping Cart
+        </h2>
+
+        {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endfor %}
+        {% endif %}
+
+        {% if items %}
+        <div class="row">
+            <!-- Cart Items -->
+            <div class="col-lg-8">
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0">Cart Items ({{ items.count }})</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="list-group list-group-flush">
+                            {% for item in items %}
+                            <div class="list-group-item">
+                                <div class="row align-items-center">
+                                    <div class="col-md-2">
+                                        {% if item.course.image %}
+                                        <img src="{{ item.course.image.url }}" alt="{{ item.course.title }}" class="img-fluid rounded" style="height: 80px; width: 100%; object-fit: cover;">
+                                        {% else %}
+                                        <div class="bg-primary text-white rounded d-flex align-items-center justify-content-center" style="height: 80px;">
+                                            <i class="fas fa-book fa-2x"></i>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h6 class="mb-1">
+                                            <a href="{% url 'courses:course_detail' item.course.slug %}" class="text-decoration-none text-dark">
+                                                {{ item.course.title }}
+                                            </a>
+                                        </h6>
+                                        <p class="text-muted small mb-1">
+                                            <i class="fas fa-user me-1"></i>{{ item.course.instructor.full_name }}
+                                        </p>
+                                        <p class="text-muted small mb-0">
+                                            <i class="fas fa-signal me-1"></i>{{ item.course.get_level_display }}
+                                        </p>
+                                    </div>
+                                    <div class="col-md-2 text-center">
+                                        <h5 class="fw-bold text-primary mb-0">
+                                            {% if item.course.price == 0 %}
+                                                Free
+                                            {% else %}
+                                                GHS {{ item.course.price }}
+                                            {% endif %}
+                                        </h5>
+                                    </div>
+                                    <div class="col-md-2 text-end">
+                                        <form method="post" action="{% url 'courses:remove_from_cart' item.id %}">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Remove this course from cart?')">
+                                                <i class="fas fa-trash"></i> Remove
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Continue Shopping -->
+                <a href="{% url 'courses:courses_list' %}" class="btn btn-outline-primary">
+                    <i class="fas fa-arrow-left me-2"></i>Continue Shopping
+                </a>
+            </div>
+
+            <!-- Cart Summary -->
+            <div class="col-lg-4">
+                <div class="card shadow-sm sticky-top" style="top: 20px;">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">Order Summary</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Subtotal:</span>
+                            <span>GHS {{ total }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Tax:</span>
+                            <span>GHS 0.00</span>
+                        </div>
+                        <hr>
+                        <div class="d-flex justify-content-between mb-4">
+                            <strong>Total:</strong>
+                            <strong class="text-primary fs-4">GHS {{ total }}</strong>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <a href="{% url 'courses:checkout' %}" class="btn btn-primary btn-lg">
+                                <i class="fas fa-lock me-2"></i>Proceed to Checkout
+                            </a>
+                        </div>
+
+                        <div class="mt-4">
+                            <small class="text-muted">
+                                <i class="fas fa-shield-alt me-2"></i>
+                                Secure checkout powered by Paystack
+                            </small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Benefits -->
+                <div class="card shadow-sm mt-4">
+                    <div class="card-body">
+                        <h6 class="fw-bold mb-3">What you'll get:</h6>
+                        <ul class="list-unstyled small">
+                            <li class="mb-2">
+                                <i class="fas fa-check text-success me-2"></i>
+                                Lifetime access to courses
+                            </li>
+                            <li class="mb-2">
+                                <i class="fas fa-check text-success me-2"></i>
+                                Certificate of completion
+                            </li>
+                            <li class="mb-2">
+                                <i class="fas fa-check text-success me-2"></i>
+                                Downloadable resources
+                            </li>
+                            <li class="mb-2">
+                                <i class="fas fa-check text-success me-2"></i>
+                                Access to course discussions
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% else %}
+        <!-- Empty Cart -->
+        <div class="text-center py-5">
+            <div class="mb-4">
+                <i class="fas fa-shopping-cart fa-5x text-muted"></i>
+            </div>
+            <h3 class="fw-bold mb-3">Your cart is empty</h3>
+            <p class="text-muted mb-4">Start adding courses to your cart to continue learning!</p>
+            <a href="{% url 'courses:courses_list' %}" class="btn btn-primary btn-lg">
+                <i class="fas fa-search me-2"></i>Browse Courses
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

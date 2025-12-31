@@ -1,0 +1,167 @@
+{% extends 'custom_admin/base.html' %}
+
+{% block title %}Courses Management{% endblock %}
+{% block page_title %}Courses Management{% endblock %}
+
+{% block content %}
+<!-- Filter Section -->
+<div class="filter-section">
+    <form method="get" class="row g-3">
+        <div class="col-md-3">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" name="search" class="form-control" placeholder="Search courses..." value="{{ search_query }}">
+            </div>
+        </div>
+        <div class="col-md-2">
+            <select name="category" class="form-select">
+                <option value="">All Categories</option>
+                {% for category in categories %}
+                <option value="{{ category.id }}" {% if selected_category == category.id|stringformat:"s" %}selected{% endif %}>
+                    {{ category.name }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-2">
+            <select name="level" class="form-select">
+                <option value="">All Levels</option>
+                <option value="beginner" {% if selected_level == 'beginner' %}selected{% endif %}>Beginner</option>
+                <option value="intermediate" {% if selected_level == 'intermediate' %}selected{% endif %}>Intermediate</option>
+                <option value="advanced" {% if selected_level == 'advanced' %}selected{% endif %}>Advanced</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <select name="featured" class="form-select">
+                <option value="">All Courses</option>
+                <option value="yes" {% if selected_featured == 'yes' %}selected{% endif %}>Featured Only</option>
+                <option value="no" {% if selected_featured == 'no' %}selected{% endif %}>Non-Featured</option>
+            </select>
+        </div>
+        <div class="col-md-1">
+            <button type="submit" class="btn btn-primary w-100 btn-custom">
+                <i class="fas fa-filter"></i>
+            </button>
+        </div>
+        <div class="col-md-2 text-end">
+            <span class="badge bg-primary p-2" style="font-size: 1rem;">
+                Total: {{ total_courses }}
+            </span>
+        </div>
+    </form>
+</div>
+
+<!-- Courses Table -->
+<div class="card-custom">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span><i class="fas fa-book"></i> Courses List</span>
+        <a href="{% url 'courses:admin_create_course' %}" class="btn btn-sm btn-success btn-custom">
+            <i class="fas fa-plus-circle"></i> Create New Course (All-in-One)
+        </a>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-custom mb-0">
+                <thead>
+                    <tr>
+                        <th>Course</th>
+                        <th>Instructor</th>
+                        <th>Level</th>
+                        <th>Students</th>
+                        <th>Rating</th>
+                        <th>Revenue</th>
+                        <th>Featured</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for course in courses %}
+                    <tr>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                {% if course.image %}
+                                <img src="{{ course.image.url }}" alt="{{ course.title }}" class="me-2" style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px;">
+                                {% else %}
+                                <div class="me-2 d-flex align-items-center justify-content-center" style="width: 60px; height: 60px; background: #f0f0f0; border-radius: 8px;">
+                                    <i class="fas fa-book fa-2x text-muted"></i>
+                                </div>
+                                {% endif %}
+                                <div>
+                                    <strong>{{ course.title|truncatewords:5 }}</strong>
+                                    <br><small class="text-muted">{{ course.category.name }}</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td>{{ course.instructor.full_name }}</td>
+                        <td><span class="badge bg-secondary">{{ course.get_level_display }}</span></td>
+                        <td><span class="badge bg-primary">{{ course.enrollment_count }}</span></td>
+                        <td>
+                            {% if course.avg_rating %}
+                            <span class="text-warning">
+                                <i class="fas fa-star"></i> {{ course.avg_rating|floatformat:1 }}
+                            </span>
+                            {% else %}
+                            <span class="text-muted">N/A</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if course.revenue %}
+                            <span class="text-success">GH₵{{ course.revenue|floatformat:2 }}</span>
+                            {% else %}
+                            <span class="text-muted">GH₵0.00</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if course.is_featured %}
+                            <span class="badge bg-success">Yes</span>
+                            {% else %}
+                            <span class="badge bg-secondary">No</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{% url 'courses:admin_course_detail' course.id %}" class="btn btn-sm btn-outline-primary btn-custom">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="8" class="text-center text-muted py-4">
+                            <i class="fas fa-book fa-3x mb-3 d-block"></i>
+                            No courses found
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Pagination -->
+{% if courses.has_other_pages %}
+<nav aria-label="Page navigation" class="mt-4">
+    <ul class="pagination justify-content-center">
+        {% if courses.has_previous %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ courses.previous_page_number }}&search={{ search_query }}&category={{ selected_category }}&level={{ selected_level }}&featured={{ selected_featured }}">
+                <i class="fas fa-chevron-left"></i> Previous
+            </a>
+        </li>
+        {% endif %}
+
+        <li class="page-item active">
+            <span class="page-link">Page {{ courses.number }} of {{ courses.paginator.num_pages }}</span>
+        </li>
+
+        {% if courses.has_next %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ courses.next_page_number }}&search={{ search_query }}&category={{ selected_category }}&level={{ selected_level }}&featured={{ selected_featured }}">
+                Next <i class="fas fa-chevron-right"></i>
+            </a>
+        </li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}
+{% endblock %}
