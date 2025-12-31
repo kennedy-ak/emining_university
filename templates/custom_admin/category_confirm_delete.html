@@ -1,0 +1,61 @@
+{% extends 'custom_admin/base.html' %}
+{% load static %}
+
+{% block title %}Delete Category - Admin{% endblock %}
+{% block page_title %}Delete Category{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-lg-6 col-md-8 mx-auto">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>Delete Category</h2>
+                <a href="{% url 'courses:admin_categories_list' %}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to Categories
+                </a>
+            </div>
+
+            <div class="card-custom border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0"><i class="fas fa-exclamation-triangle"></i> Confirm Deletion</h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-circle"></i>
+                        Are you sure you want to delete the category "<strong>{{ category.name }}</strong>"?
+                    </div>
+
+                    <div class="mb-3">
+                        <p><strong>Category Details:</strong></p>
+                        <ul>
+                            <li>Name: <strong>{{ category.name }}</strong></li>
+                            <li>Slug: <code>{{ category.slug }}</code></li>
+                            <li>Number of Courses: <span class="badge bg-primary">{{ course_count }}</span></li>
+                        </ul>
+                    </div>
+
+                    {% if course_count > 0 %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i>
+                        <strong>Note:</strong> This category is used by {{ course_count }} course{{ course_count|pluralize }}.
+                        Deleting it will set {{ course_count|pluralize:"this,these" }} course{{ course_count|pluralize }} to have no category.
+                    </div>
+                    {% endif %}
+
+                    <form method="post" class="mt-4">
+                        {% csrf_token %}
+                        <div class="text-end">
+                            <a href="{% url 'courses:admin_categories_list' %}" class="btn btn-secondary me-2">
+                                <i class="fas fa-times"></i> Cancel
+                            </a>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash"></i> Yes, Delete Category
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

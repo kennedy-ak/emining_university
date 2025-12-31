@@ -14,7 +14,7 @@ from .models import (
     LessonProgress, Cart, CartItem, Order, OrderItem, Review, Discussion,
     DiscussionReply, Certificate, CourseMaterial
 )
-from .forms import CourseCreateForm, InstructorCreateForm
+from .forms import CourseCreateForm, InstructorCreateForm, CategoryForm
 
 # Decorator to check if user is superuser
 def superuser_required(function):
@@ -828,6 +828,66 @@ def admin_categories_list(request):
     }
 
     return render(request, 'custom_admin/categories_list.html', context)
+
+@login_required
+@superuser_required
+def admin_create_category(request):
+    """Create new category"""
+    if request.method == 'POST':
+        form = CategoryForm(request.POST)
+        if form.is_valid():
+            category = form.save()
+            messages.success(request, f'Category "{category.name}" created successfully!')
+            return redirect('courses:admin_categories_list')
+    else:
+        form = CategoryForm()
+
+    context = {
+        'form': form,
+        'action': 'Create',
+    }
+    return render(request, 'custom_admin/category_form.html', context)
+
+@login_required
+@superuser_required
+def admin_edit_category(request, category_id):
+    """Edit existing category"""
+    category = get_object_or_404(Category, id=category_id)
+
+    if request.method == 'POST':
+        form = CategoryForm(request.POST, instance=category)
+        if form.is_valid():
+            category = form.save()
+            messages.success(request, f'Category "{category.name}" updated successfully!')
+            return redirect('courses:admin_categories_list')
+    else:
+        form = CategoryForm(instance=category)
+
+    context = {
+        'form': form,
+        'category': category,
+        'action': 'Edit',
+    }
+    return render(request, 'custom_admin/category_form.html', context)
+
+@login_required
+@superuser_required
+def admin_delete_category(request, category_id):
+    """Delete category"""
+    category = get_object_or_404(Category, id=category_id)
+
+    if request.method == 'POST':
+        category_name = category.name
+        category.delete()
+        messages.success(request, f'Category "{category_name}" deleted successfully!')
+        return redirect('courses:admin_categories_list')
+
+    # If GET request, show confirmation
+    context = {
+        'category': category,
+        'course_count': category.course_set.count(),
+    }
+    return render(request, 'custom_admin/category_confirm_delete.html', context)
 
 # ============================================================================
 # ALL-IN-ONE COURSE CREATOR

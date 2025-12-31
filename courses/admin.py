@@ -4,6 +4,7 @@ from .models import (
     CourseMaterial, LessonProgress, Cart, CartItem, Order, OrderItem,
     Review, Discussion, DiscussionReply, Certificate
 )
+from .forms import CategoryForm
 
 @admin.register(UserProfile)
 class UserProfileAdmin(admin.ModelAdmin):
@@ -14,9 +15,16 @@ class UserProfileAdmin(admin.ModelAdmin):
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
-    list_display = ['name', 'slug']
+    form = CategoryForm
+    list_display = ['name', 'slug', 'get_course_count']
     prepopulated_fields = {'slug': ('name',)}
-    search_fields = ['name']
+    search_fields = ['name', 'slug']
+    ordering = ['name']
+
+    def get_course_count(self, obj):
+        """Display number of courses in this category"""
+        return obj.course_set.count()
+    get_course_count.short_description = 'Number of Courses'
 
 @admin.register(Instructor)
 class InstructorAdmin(admin.ModelAdmin):

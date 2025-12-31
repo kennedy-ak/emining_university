@@ -96,4 +96,7 @@ urlpatterns = [
 
     # Categories Management
     path('custom-admin/categories/', admin_views.admin_categories_list, name='admin_categories_list'),
+    path('custom-admin/categories/create/', admin_views.admin_create_category, name='admin_create_category'),
+    path('custom-admin/categories/<int:category_id>/edit/', admin_views.admin_edit_category, name='admin_edit_category'),
+    path('custom-admin/categories/<int:category_id>/delete/', admin_views.admin_delete_category, name='admin_delete_category'),
 ]

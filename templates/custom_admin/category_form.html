@@ -1,0 +1,99 @@
+{% extends 'custom_admin/base.html' %}
+{% load static %}
+
+{% block title %}{{ action }} Category - Admin{% endblock %}
+{% block page_title %}{{ action }} Category{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-lg-8 col-md-10 mx-auto">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>{{ action }} Category</h2>
+                <a href="{% url 'courses:admin_categories_list' %}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to Categories
+                </a>
+            </div>
+
+            <div class="card-custom">
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+
+                        {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {{ form.non_field_errors }}
+                        </div>
+                        {% endif %}
+
+                        <div class="mb-3">
+                            <label for="id_name" class="form-label">Category Name *</label>
+                            {{ form.name }}
+                            {% if form.name.help_text %}
+                            <small class="form-text text-muted">{{ form.name.help_text }}</small>
+                            {% endif %}
+                            {% if form.name.errors %}
+                            <div class="text-danger mt-1">{{ form.name.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="id_slug" class="form-label">Slug</label>
+                            {{ form.slug }}
+                            {% if form.slug.help_text %}
+                            <small class="form-text text-muted">{{ form.slug.help_text }}</small>
+                            {% endif %}
+                            {% if form.slug.errors %}
+                            <div class="text-danger mt-1">{{ form.slug.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="text-end mt-4">
+                            <a href="{% url 'courses:admin_categories_list' %}" class="btn btn-secondary me-2">
+                                <i class="fas fa-times"></i> Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> {{ action }} Category
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            {% if action == 'Edit' and category %}
+            <div class="card-custom mt-4">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0"><i class="fas fa-info-circle"></i> Category Information</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Number of Courses:</strong> <span class="badge bg-primary">{{ category.course_set.count }}</span></p>
+                    <p class="text-muted mb-0">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Note: Deleting this category will set all associated courses to have no category.
+                    </p>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+    // Auto-generate slug from name
+    document.addEventListener('DOMContentLoaded', function() {
+        const nameInput = document.getElementById('id_name');
+        const slugInput = document.getElementById('id_slug');
+
+        // Only auto-generate if creating new category (slug is empty)
+        if (nameInput && slugInput && !slugInput.value) {
+            nameInput.addEventListener('input', function() {
+                const slug = this.value
+                    .toLowerCase()
+                    .replace(/[^a-z0-9]+/g, '-')
+                    .replace(/^-+|-+$/g, '');
+                slugInput.value = slug;
+            });
+        }
+    });
+</script>
+{% endblock %}

@@ -150,6 +150,46 @@ class CourseSearchForm(forms.Form):
     )
 
 # ============================================================================
+# CATEGORY FORM
+# ============================================================================
+
+class CategoryForm(forms.ModelForm):
+    class Meta:
+        model = Category
+        fields = ['name', 'slug']
+        widgets = {
+            'name': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Category name (e.g., Mining Engineering)',
+                'autofocus': True
+            }),
+            'slug': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'category-slug (auto-generated from name)',
+            }),
+        }
+        help_texts = {
+            'name': 'Enter the category name',
+            'slug': 'URL-friendly version of the name (will auto-populate)',
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Make slug field optional for initial creation (will auto-populate)
+        self.fields['slug'].required = False
+
+    def clean_slug(self):
+        from django.utils.text import slugify
+        slug = self.cleaned_data.get('slug')
+        name = self.cleaned_data.get('name', '')
+
+        # Auto-generate slug from name if not provided
+        if not slug and name:
+            slug = slugify(name)
+
+        return slug
+
+# ============================================================================
 # ALL-IN-ONE COURSE CREATOR FORMS
 # ============================================================================
 
