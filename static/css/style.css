@@ -1,13 +1,67 @@
 /* General Styles */
 :root {
-    --primary-color: #0d6efd;
-    --secondary-color: #6c757d;
-    --success-color: #198754;
+    /* Main Color Palette - Earthy Greens */
+    --dust-grey: #DAD7CD;
+    --dry-sage: #A3B18A;
+    --forest-green: #588157;
+    --deep-forest: #3A5A40;
+    --darkest-green: #344E41;
+
+    /* Functional Colors */
+    --primary-color: #588157;
+    --secondary-color: #A3B18A;
+    --success-color: #588157;
     --danger-color: #dc3545;
     --warning-color: #ffc107;
-    --info-color: #0dcaf0;
-    --light-color: #f8f9fa;
-    --dark-color: #212529;
+    --info-color: #A3B18A;
+    --light-color: #DAD7CD;
+    --dark-color: #344E41;
+
+    /* Bootstrap Override */
+    --bs-primary: #588157;
+    --bs-primary-rgb: 88, 129, 87;
+}
+
+/* Override Bootstrap Primary Colors Globally */
+.text-primary {
+    color: #588157 !important;
+}
+
+.bg-primary {
+    background-color: #588157 !important;
+}
+
+.border-primary {
+    border-color: #588157 !important;
+}
+
+.badge.bg-primary {
+    background-color: #588157 !important;
+}
+
+.alert-primary {
+    background-color: rgba(88, 129, 87, 0.1) !important;
+    border-color: #588157 !important;
+    color: #344E41 !important;
+}
+
+.bg-info {
+    background-color: #A3B18A !important;
+}
+
+.badge.bg-info {
+    background-color: #A3B18A !important;
+    color: white !important;
+}
+
+.text-info {
+    color: #A3B18A !important;
+}
+
+.btn-info {
+    background-color: #A3B18A !important;
+    border-color: #A3B18A !important;
+    color: white !important;
 }
 
 body {
@@ -47,7 +101,7 @@ body {
 
 /* Hero Section */
 .hero-section {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #588157 0%, #3A5A40 100%);
     min-height: 500px;
     margin-top: 0 !important;
     padding-top: 3rem !important;
@@ -116,7 +170,7 @@ body {
 
 /* Footer Styles */
 footer {
-    background-color: #1a1a1a !important;
+    background: linear-gradient(135deg, #344E41 0%, #3A5A40 100%) !important;
 }
 
 footer a {
@@ -217,14 +271,14 @@ footer a:hover {
 }
 
 ::-webkit-scrollbar-track {
-    background: #f1f1f1;
+    background: var(--dust-grey);
 }
 
 ::-webkit-scrollbar-thumb {
-    background: #888;
+    background: var(--dry-sage);
     border-radius: 5px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: #555;
+    background: var(--forest-green);
 }

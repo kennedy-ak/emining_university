@@ -15,8 +15,8 @@
     <style>
         :root {
             --sidebar-width: 260px;
-            --primary-color: #667eea;
-            --sidebar-bg: linear-gradient(180deg, #1e3a8a 0%, #1e40af 100%);
+            --primary-color: #588157;
+            --sidebar-bg: linear-gradient(180deg, #3A5A40 0%, #344E41 100%);
         }
 
         * {
@@ -151,7 +151,7 @@
         }
 
         .mobile-menu-toggle:hover {
-            background: #5568d3;
+            background: #3A5A40;
             transform: scale(1.05);
         }
 
@@ -224,7 +224,7 @@
         }
 
         .stat-card .icon.primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #588157 0%, #3A5A40 100%);
             color: white;
         }
 
@@ -552,7 +552,7 @@
                 {% if user.userprofile.profile_picture %}
                 <img src="{{ user.userprofile.profile_picture.url }}" alt="{{ user.username }}">
                 {% else %}
-                <div style="width: 40px; height: 40px; background: #667eea; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">
+                <div style="width: 40px; height: 40px; background: #588157; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">
                     {{ user.username|slice:":1"|upper }}
                 </div>
                 {% endif %}

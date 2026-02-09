@@ -55,7 +55,7 @@
                                 {% if instructor.profile_picture %}
                                 <img src="{{ instructor.profile_picture.url }}" alt="{{ instructor.full_name }}" class="rounded-circle me-2" style="width: 50px; height: 50px; object-fit: cover;">
                                 {% else %}
-                                <div class="rounded-circle me-2 d-flex align-items-center justify-content-center" style="width: 50px; height: 50px; background: #667eea; color: white; font-weight: bold;">
+                                <div class="rounded-circle me-2 d-flex align-items-center justify-content-center" style="width: 50px; height: 50px; background: #588157; color: white; font-weight: bold;">
                                     {{ instructor.full_name|slice:":1"|upper }}
                                 </div>
                                 {% endif %}

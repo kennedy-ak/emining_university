@@ -62,7 +62,7 @@
                                 {% if user_item.profile.profile_picture %}
                                 <img src="{{ user_item.profile.profile_picture.url }}" alt="{{ user_item.username }}" class="rounded-circle me-2" style="width: 40px; height: 40px; object-fit: cover;">
                                 {% else %}
-                                <div class="rounded-circle me-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; background: #667eea; color: white; font-weight: bold;">
+                                <div class="rounded-circle me-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; background: #588157; color: white; font-weight: bold;">
                                     {{ user_item.username|slice:":1"|upper }}
                                 </div>
                                 {% endif %}

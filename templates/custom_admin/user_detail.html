@@ -15,7 +15,7 @@
                 {% if user_obj.profile.profile_picture %}
                 <img src="{{ user_obj.profile.profile_picture.url }}" alt="{{ user_obj.username }}" class="rounded-circle mb-3" style="width: 120px; height: 120px; object-fit: cover;">
                 {% else %}
-                <div class="rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" style="width: 120px; height: 120px; background: #667eea; color: white; font-weight: bold; font-size: 3rem;">
+                <div class="rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" style="width: 120px; height: 120px; background: #588157; color: white; font-weight: bold; font-size: 3rem;">
                     {{ user_obj.username|slice:":1"|upper }}
                 </div>
                 {% endif %}
