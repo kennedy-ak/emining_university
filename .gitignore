@@ -50,6 +50,7 @@ staticfiles/
 local_settings.py
 db.sqlite
 *.log.*
+backup_data_*.json
 
 # Python version files
 .python-version
