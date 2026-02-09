@@ -402,3 +402,59 @@ class InstructorCreateForm(forms.ModelForm):
             instructor.save()
 
         return instructor
+
+class InstructorEditForm(forms.ModelForm):
+    """Form for editing existing instructors"""
+
+    # User email field (username cannot be changed)
+    email = forms.EmailField(
+        required=True,
+        widget=forms.EmailInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'instructor@example.com'
+        })
+    )
+
+    class Meta:
+        model = Instructor
+        fields = ['full_name', 'bio', 'profile_image']
+        widgets = {
+            'full_name': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Full name of the instructor'
+            }),
+            'bio': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 5,
+                'placeholder': 'Brief biography of the instructor'
+            }),
+            'profile_image': forms.FileInput(attrs={
+                'class': 'form-control'
+            }),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance and self.instance.user:
+            self.fields['email'].initial = self.instance.user.email
+
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        # Check if email already exists for another user
+        if User.objects.filter(email=email).exclude(id=self.instance.user.id).exists():
+            raise forms.ValidationError('Email already exists for another user.')
+        return email
+
+    def save(self, commit=True):
+        instructor = super().save(commit=False)
+
+        # Update user email
+        if self.instance.user:
+            self.instance.user.email = self.cleaned_data['email']
+            if commit:
+                self.instance.user.save()
+
+        if commit:
+            instructor.save()
+
+        return instructor

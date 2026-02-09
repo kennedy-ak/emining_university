@@ -93,6 +93,8 @@ urlpatterns = [
     path('custom-admin/instructors/', admin_views.admin_instructors_list, name='admin_instructors_list'),
     path('custom-admin/instructors/create/', admin_views.admin_create_instructor, name='admin_create_instructor'),
     path('custom-admin/instructors/<int:instructor_id>/', admin_views.admin_instructor_detail, name='admin_instructor_detail'),
+    path('custom-admin/instructors/<int:instructor_id>/edit/', admin_views.admin_edit_instructor, name='admin_edit_instructor'),
+    path('custom-admin/instructors/<int:instructor_id>/delete/', admin_views.admin_delete_instructor, name='admin_delete_instructor'),
 
     # Categories Management
     path('custom-admin/categories/', admin_views.admin_categories_list, name='admin_categories_list'),

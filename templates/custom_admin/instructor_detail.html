@@ -51,9 +51,14 @@
 
                 <hr>
 
-                <a href="/admin/courses/instructor/{{ instructor.id }}/change/" target="_blank" class="btn btn-primary w-100 btn-custom">
-                    <i class="fas fa-edit"></i> Edit Instructor
-                </a>
+                <div class="d-grid gap-2">
+                    <a href="{% url 'courses:admin_edit_instructor' instructor.id %}" class="btn btn-primary btn-custom">
+                        <i class="fas fa-edit"></i> Edit Instructor
+                    </a>
+                    <a href="{% url 'courses:admin_delete_instructor' instructor.id %}" class="btn btn-danger btn-custom">
+                        <i class="fas fa-trash"></i> Delete Instructor
+                    </a>
+                </div>
             </div>
         </div>
     </div>

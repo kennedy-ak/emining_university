@@ -78,9 +78,17 @@
                             {% endif %}
                         </td>
                         <td>
-                            <a href="{% url 'courses:admin_instructor_detail' instructor.id %}" class="btn btn-sm btn-outline-primary btn-custom">
-                                <i class="fas fa-eye"></i> View
-                            </a>
+                            <div class="btn-group" role="group">
+                                <a href="{% url 'courses:admin_instructor_detail' instructor.id %}" class="btn btn-sm btn-outline-primary btn-custom" title="View Details">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a href="{% url 'courses:admin_edit_instructor' instructor.id %}" class="btn btn-sm btn-outline-secondary btn-custom" title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a href="{% url 'courses:admin_delete_instructor' instructor.id %}" class="btn btn-sm btn-outline-danger btn-custom" title="Delete">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </div>
                         </td>
                     </tr>
                     {% empty %}

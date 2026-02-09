@@ -14,7 +14,7 @@ from .models import (
     LessonProgress, Cart, CartItem, Order, OrderItem, Review, Discussion,
     DiscussionReply, Certificate, CourseMaterial
 )
-from .forms import CourseCreateForm, InstructorCreateForm, CategoryForm
+from .forms import CourseCreateForm, InstructorCreateForm, InstructorEditForm, CategoryForm
 
 # Decorator to check if user is superuser
 def superuser_required(function):
@@ -808,6 +808,60 @@ def admin_create_instructor(request):
         'form': form,
     }
     return render(request, 'custom_admin/create_instructor.html', context)
+
+@login_required
+@superuser_required
+def admin_edit_instructor(request, instructor_id):
+    """Edit existing instructor"""
+    instructor = get_object_or_404(Instructor, id=instructor_id)
+
+    if request.method == 'POST':
+        form = InstructorEditForm(request.POST, request.FILES, instance=instructor)
+        if form.is_valid():
+            instructor = form.save()
+            messages.success(request, f'Instructor "{instructor.full_name}" updated successfully!')
+            return redirect('courses:admin_instructor_detail', instructor_id=instructor.id)
+        else:
+            messages.error(request, 'Please correct the errors below.')
+    else:
+        form = InstructorEditForm(instance=instructor)
+
+    context = {
+        'form': form,
+        'instructor': instructor,
+    }
+    return render(request, 'custom_admin/edit_instructor.html', context)
+
+@login_required
+@superuser_required
+def admin_delete_instructor(request, instructor_id):
+    """Delete an instructor"""
+    instructor = get_object_or_404(Instructor, id=instructor_id)
+
+    if request.method == 'POST':
+        instructor_name = instructor.full_name
+        user = instructor.user
+
+        # Delete the instructor (this will also cascade delete related objects)
+        instructor.delete()
+
+        # Optionally delete the associated user account
+        if user and request.POST.get('delete_user') == 'yes':
+            user.delete()
+            messages.success(request, f'Instructor "{instructor_name}" and associated user account deleted successfully!')
+        else:
+            messages.success(request, f'Instructor "{instructor_name}" deleted successfully!')
+
+        return redirect('courses:admin_instructors_list')
+
+    # Count related objects to show in confirmation
+    course_count = instructor.courses.count()
+
+    context = {
+        'instructor': instructor,
+        'course_count': course_count,
+    }
+    return render(request, 'custom_admin/instructor_confirm_delete.html', context)
 
 # ============================================================================
 # CATEGORIES MANAGEMENT

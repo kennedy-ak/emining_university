@@ -1,0 +1,72 @@
+{% extends 'custom_admin/base.html' %}
+{% load static %}
+
+{% block title %}Delete Instructor - Admin{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card-custom">
+                <div class="card-body">
+                    <div class="text-center mb-4">
+                        <i class="fas fa-exclamation-triangle text-danger" style="font-size: 4rem;"></i>
+                        <h2 class="mt-3">Delete Instructor</h2>
+                    </div>
+
+                    <div class="alert alert-warning">
+                        <h5><i class="fas fa-info-circle"></i> Warning</h5>
+                        <p class="mb-0">
+                            You are about to delete the instructor <strong>{{ instructor.full_name }}</strong>.
+                            This action cannot be undone!
+                        </p>
+                    </div>
+
+                    <div class="mb-4">
+                        <h5>Instructor Information:</h5>
+                        <ul class="list-unstyled">
+                            <li><strong>Name:</strong> {{ instructor.full_name }}</li>
+                            <li><strong>Email:</strong> {{ instructor.user.email }}</li>
+                            <li><strong>Username:</strong> {{ instructor.user.username }}</li>
+                            <li><strong>Total Courses:</strong> {{ course_count }}</li>
+                        </ul>
+                    </div>
+
+                    {% if course_count > 0 %}
+                    <div class="alert alert-danger">
+                        <h5><i class="fas fa-exclamation-circle"></i> Important</h5>
+                        <p class="mb-0">
+                            This instructor has <strong>{{ course_count }} course(s)</strong> associated with them.
+                            Deleting this instructor will not delete the courses, but they will need to be reassigned to another instructor.
+                        </p>
+                    </div>
+                    {% endif %}
+
+                    <form method="post">
+                        {% csrf_token %}
+
+                        <div class="form-check mb-4">
+                            <input class="form-check-input" type="checkbox" name="delete_user" value="yes" id="delete_user">
+                            <label class="form-check-label" for="delete_user">
+                                Also delete the associated user account ({{ instructor.user.username }})
+                            </label>
+                            <small class="form-text text-muted d-block">
+                                If unchecked, only the instructor profile will be deleted, but the user account will remain in the system.
+                            </small>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center">
+                            <a href="{% url 'courses:admin_instructor_detail' instructor.id %}" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Cancel
+                            </a>
+                            <button type="submit" class="btn btn-danger btn-lg">
+                                <i class="fas fa-trash"></i> Yes, Delete Instructor
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
