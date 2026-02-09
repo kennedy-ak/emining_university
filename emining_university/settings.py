@@ -32,19 +32,20 @@ DEBUG = config('DEBUG', default=True, cast=bool)
 
 # ALLOWED_HOSTS configuration
 try:
-    allowed_hosts_str = config('ALLOWED_HOSTS', default='localhost,127.0.0.1,emining.digitalrepublic.space')
+    allowed_hosts_str = config('ALLOWED_HOSTS', default='localhost,127.0.0.1,emining.digitalrepublic.space,emining.vendlyghana.space')
     if isinstance(allowed_hosts_str, str):
         ALLOWED_HOSTS = [host.strip() for host in allowed_hosts_str.split(',')]
     else:
-        ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'emining.digitalrepublic.space']
+        ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'emining.digitalrepublic.space', 'emining.vendlyghana.space']
 except:
-    ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'emining.digitalrepublic.space']
+    ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'emining.digitalrepublic.space', 'emining.vendlyghana.space']
 
 # CSRF Configuration
 CSRF_TRUSTED_ORIGINS = [
     'http://localhost:8000',
     'http://127.0.0.1:8000',
     'https://emining.digitalrepublic.space',
+    'https://emining.vendlyghana.space',
 ]
 
 # CORS Configuration (for API access)
@@ -52,6 +53,7 @@ CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',
     'http://127.0.0.1:3000',
     'https://emining.digitalrepublic.space',
+    'https://emining.vendlyghana.space',
 ]
 
 CORS_ALLOW_CREDENTIALS = True
