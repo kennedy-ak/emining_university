@@ -13,6 +13,8 @@ crispy-bootstrap5>=2025.6
 
 # Image Processing
 Pillow>=12.0.0
+cloudinary>=1.41.0
+django-cloudinary-storage>=0.3.0
 
 # HTTP Requests
 requests>=2.31.0

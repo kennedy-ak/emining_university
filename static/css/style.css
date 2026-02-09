@@ -14,24 +14,34 @@ body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     color: #333;
     line-height: 1.6;
+    padding-top: 0 !important;
+    margin: 0;
 }
 
 /* Navbar Styles */
 .navbar {
     padding: 1rem 0;
+    background-color: #ffffff !important;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
 }
 
 .navbar-brand {
     font-size: 1.5rem;
+    font-weight: 700 !important;
 }
 
 .nav-link {
     font-weight: 500;
     padding: 0.5rem 1rem !important;
     transition: color 0.3s ease;
+    color: #333 !important;
 }
 
 .nav-link:hover {
+    color: var(--primary-color) !important;
+}
+
+.nav-link.active {
     color: var(--primary-color) !important;
 }
 
@@ -39,6 +49,9 @@ body {
 .hero-section {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     min-height: 500px;
+    margin-top: 0 !important;
+    padding-top: 3rem !important;
+    padding-bottom: 3rem !important;
 }
 
 .hero-section .badge {
