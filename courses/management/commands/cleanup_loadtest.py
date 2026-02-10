@@ -33,14 +33,20 @@ class Command(BaseCommand):
         if deleted_testadmin[0] > 0:
             self.stdout.write(self.style.SUCCESS("✓ Deleted testadmin user"))
 
-        # 4. Delete test courses by slug patterns
+        # 4. Delete test courses by title pattern (Load Test Course *)
+        deleted_by_title = Course.objects.filter(title__startswith='Load Test Course').delete()
+        if deleted_by_title[0] > 0:
+            self.stdout.write(self.style.SUCCESS(f"✓ Deleted {deleted_by_title[0]} courses by title pattern"))
+
+        # 5. Delete test courses by slug patterns (load-test-course-*)
         deleted_courses = Course.objects.filter(slug__startswith='load-test-course-').delete()
         if deleted_courses[0] > 0:
-            self.stdout.write(self.style.SUCCESS(f"✓ Deleted {deleted_courses[0]} load test courses"))
+            self.stdout.write(self.style.SUCCESS(f"✓ Deleted {deleted_courses[0]} load test courses (by slug)"))
 
+        # 6. Delete test courses (test-course-*)
         deleted_test_courses = Course.objects.filter(slug__startswith='test-course-').delete()
         if deleted_test_courses[0] > 0:
-            self.stdout.write(self.style.SUCCESS(f"✓ Deleted {deleted_test_courses[0]} test courses"))
+            self.stdout.write(self.style.SUCCESS(f"✓ Deleted {deleted_test_courses[0]} test courses (test-course-*)"))
 
         # 5. Delete test categories
         deleted_categories = Category.objects.filter(
