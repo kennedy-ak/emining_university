@@ -256,9 +256,7 @@
                     {% if instructor.profile_image %}
                     <img src="{{ instructor.profile_image.url }}" class="instructor-avatar" alt="{{ instructor.full_name }}">
                     {% else %}
-                    <div class="instructor-avatar-placeholder">
-                        {{ instructor.full_name|slice:":2"|upper }}
-                    </div>
+                    <img src="{% static 'images/default-avatar.png' %}" class="instructor-avatar" alt="{{ instructor.full_name }}">
                     {% endif %}
                 </div>
             </div>

@@ -273,6 +273,20 @@ class CourseCreateForm(forms.ModelForm):
             return [tag.strip() for tag in data.split(',') if tag.strip()]
         return []
 
+    def save(self, commit=True):
+        course = super().save(commit=False)
+
+        # Manually set the JSONField data from cleaned data
+        course.what_you_will_learn = self.cleaned_data.get('what_you_will_learn', [])
+        course.requirements = self.cleaned_data.get('requirements', [])
+        course.target_audience = self.cleaned_data.get('target_audience', [])
+        course.tags = self.cleaned_data.get('tags', [])
+
+        if commit:
+            course.save()
+
+        return course
+
 class SectionForm(forms.ModelForm):
     class Meta:
         model = Section

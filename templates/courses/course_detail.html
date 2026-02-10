@@ -446,19 +446,19 @@
                     <!-- Instructor Box -->
                     <div class="instructor-box">
                         <h6 class="mb-3">A course by</h6>
-                        <div class="instructor-info">
-                            {% if course.instructor.profile_image %}
-                            <img src="{{ course.instructor.profile_image.url }}" class="instructor-avatar" alt="{{ course.instructor.full_name }}">
-                            {% else %}
-                            <div class="instructor-avatar bg-primary text-white d-flex align-items-center justify-content-center">
-                                {{ course.instructor.full_name|slice:":2"|upper }}
+                        <a href="{% url 'courses:instructor_detail' course.instructor.id %}" class="text-decoration-none">
+                            <div class="instructor-info">
+                                {% if course.instructor.profile_image %}
+                                <img src="{{ course.instructor.profile_image.url }}" class="instructor-avatar" alt="{{ course.instructor.full_name }}">
+                                {% else %}
+                                <img src="{% static 'images/default-avatar.png' %}" class="instructor-avatar" alt="{{ course.instructor.full_name }}">
+                                {% endif %}
+                                <div>
+                                    <h6 class="mb-0 text-dark">{{ course.instructor.full_name }}</h6>
+                                    <small class="text-muted">Instructor</small>
+                                </div>
                             </div>
-                            {% endif %}
-                            <div>
-                                <h6 class="mb-0">{{ course.instructor.full_name }}</h6>
-                                <small class="text-muted">Instructor</small>
-                            </div>
-                        </div>
+                        </a>
                     </div>
 
                     <!-- Requirements Box -->

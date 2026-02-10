@@ -238,23 +238,25 @@
                         </div>
 
                         <!-- Instructor Info -->
-                        <div class="instructor-info">
-                            {% if course.instructor.profile_image %}
-                            <img src="{{ course.instructor.profile_image.url }}"
-                                 class="instructor-avatar"
-                                 alt="{{ course.instructor.full_name }}">
-                            {% else %}
-                            <div class="instructor-avatar-placeholder">
-                                {{ course.instructor.full_name|slice:":2"|upper }}
-                            </div>
-                            {% endif %}
-                            <div>
-                                <p class="instructor-name mb-0">By {{ course.instructor.full_name }}</p>
-                                {% if course.category %}
-                                <small class="category-tag">In {{ course.category.name }}</small>
+                        <a href="{% url 'courses:instructor_detail' course.instructor.id %}" class="text-decoration-none">
+                            <div class="instructor-info">
+                                {% if course.instructor.profile_image %}
+                                <img src="{{ course.instructor.profile_image.url }}"
+                                     class="instructor-avatar"
+                                     alt="{{ course.instructor.full_name }}">
+                                {% else %}
+                                <img src="{% static 'images/default-avatar.png' %}"
+                                     class="instructor-avatar"
+                                     alt="{{ course.instructor.full_name }}">
                                 {% endif %}
+                                <div>
+                                    <p class="instructor-name mb-0">By {{ course.instructor.full_name }}</p>
+                                    {% if course.category %}
+                                    <small class="category-tag">In {{ course.category.name }}</small>
+                                    {% endif %}
+                                </div>
                             </div>
-                        </div>
+                        </a>
                     </div>
 
                     <!-- Course Footer -->

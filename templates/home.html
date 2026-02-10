@@ -100,12 +100,14 @@
                         <span class="badge bg-info text-dark mb-2">{{ course.get_level_display }}</span>
                         <h5 class="card-title">{{ course.title }}</h5>
                         <div class="d-flex align-items-center mb-2">
-                            <img src="{% if course.instructor.profile_image %}{{ course.instructor.profile_image.url }}{% else %}{% static 'images/default-avatar.png' %}{% endif %}" 
-                                 alt="{{ course.instructor.full_name }}" 
-                                 class="rounded-circle me-2" 
-                                 width="30" 
-                                 height="30">
-                            <small class="text-muted">By {{ course.instructor.full_name }}</small>
+                            <a href="{% url 'courses:instructor_detail' course.instructor.id %}" class="d-flex align-items-center text-decoration-none">
+                                <img src="{% if course.instructor.profile_image %}{{ course.instructor.profile_image.url }}{% else %}{% static 'images/default-avatar.png' %}{% endif %}"
+                                     alt="{{ course.instructor.full_name }}"
+                                     class="rounded-circle me-2"
+                                     width="30"
+                                     height="30">
+                                <small class="text-muted">By {{ course.instructor.full_name }}</small>
+                            </a>
                         </div>
                         {% if course.category %}
                         <small class="text-muted">In {{ course.category.name }}</small>
