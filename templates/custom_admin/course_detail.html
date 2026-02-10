@@ -61,9 +61,50 @@
                 <a href="{% url 'courses:admin_edit_course' course.id %}" class="btn btn-primary w-100 btn-custom mt-2">
                     <i class="fas fa-edit"></i> Edit Course
                 </a>
+                <button type="button" class="btn btn-danger w-100 btn-custom mt-2" data-bs-toggle="modal" data-bs-target="#deleteCourseModal">
+                    <i class="fas fa-trash"></i> Delete Course
+                </button>
             </div>
         </div>
     </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteCourseModal" tabindex="-1" aria-labelledby="deleteCourseModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteCourseModalLabel">
+                        <i class="fas fa-exclamation-triangle text-danger"></i> Delete Course
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <strong>Warning:</strong> This action cannot be undone!
+                    </div>
+                    <p>Are you sure you want to delete the course <strong>"{{ course.title }}"</strong>?</p>
+                    <p class="text-muted mb-0">This will permanently delete:</p>
+                    <ul class="mb-0">
+                        <li>All course sections and lessons</li>
+                        <li>All enrollments and progress data</li>
+                        <li>All reviews and discussions</li>
+                        <li>All certificates issued</li>
+                    </ul>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <form method="post" action="{% url 'courses:admin_delete_course' course.id %}" class="d-inline">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-trash"></i> Yes, Delete Course
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
     <div class="col-md-8">
         <!-- Course Content -->

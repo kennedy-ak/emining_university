@@ -42,6 +42,9 @@ django-storages>=1.14.2
 # Error Tracking
 sentry-sdk>=1.38.0
 
+# Load Testing
+locust>=2.0.0
+
 # Development Dependencies
 # Uncomment for development
 # django-debug-toolbar>=4.2.0

@@ -215,3 +215,8 @@ docs/_build/
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+# Load testing
+locustfile.py
+create_loadtest_data.py
+cleanup_loadtest_data.py

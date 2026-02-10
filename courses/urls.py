@@ -65,6 +65,7 @@ urlpatterns = [
     path('custom-admin/courses/create/', admin_views.admin_create_course, name='admin_create_course'),
     path('custom-admin/courses/<int:course_id>/', admin_views.admin_course_detail, name='admin_course_detail'),
     path('custom-admin/courses/<int:course_id>/edit/', admin_views.admin_edit_course, name='admin_edit_course'),
+    path('custom-admin/courses/<int:course_id>/delete/', admin_views.admin_delete_course, name='admin_delete_course'),
     path('custom-admin/courses/<int:course_id>/toggle-featured/', admin_views.admin_toggle_course_featured, name='admin_toggle_course_featured'),
 
     # Orders Management

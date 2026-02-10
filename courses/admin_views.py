@@ -1089,3 +1089,22 @@ def admin_edit_course(request, course_id):
     }
 
     return render(request, 'custom_admin/create_course.html', context)
+
+
+@login_required
+@superuser_required
+def admin_delete_course(request, course_id):
+    """Delete a course"""
+    course = get_object_or_404(Course, id=course_id)
+
+    if request.method == 'POST':
+        course_title = course.title
+
+        # Delete the course (cascade delete will handle related objects)
+        course.delete()
+
+        messages.success(request, f'Course "{course_title}" and all related data deleted successfully!')
+        return redirect('courses:admin_courses_list')
+
+    # For GET requests, redirect to course detail (modal handles confirmation)
+    return redirect('courses:admin_course_detail', course_id=course_id)

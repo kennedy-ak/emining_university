@@ -54,13 +54,51 @@
                     <a href="{% url 'courses:admin_edit_instructor' instructor.id %}" class="btn btn-primary btn-custom">
                         <i class="fas fa-edit"></i> Edit Instructor
                     </a>
-                    <a href="{% url 'courses:admin_delete_instructor' instructor.id %}" class="btn btn-danger btn-custom">
+                    <button type="button" class="btn btn-danger btn-custom" data-bs-toggle="modal" data-bs-target="#deleteInstructorModal">
                         <i class="fas fa-trash"></i> Delete Instructor
-                    </a>
+                    </button>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteInstructorModal" tabindex="-1" aria-labelledby="deleteInstructorModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteInstructorModalLabel">
+                        <i class="fas fa-exclamation-triangle text-danger"></i> Delete Instructor
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <strong>Warning:</strong> This action cannot be undone!
+                    </div>
+                    <p>Are you sure you want to delete instructor <strong>"{{ instructor.full_name }}"</strong>?</p>
+                    <p class="text-muted mb-0">This will permanently delete:</p>
+                    <ul class="mb-0">
+                        <li>The instructor account</li>
+                        <li>All associated courses</li>
+                        <li>All enrollments and progress data</li>
+                        <li>All certificates issued for their courses</li>
+                    </ul>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <form method="post" action="{% url 'courses:admin_delete_instructor' instructor.id %}" class="d-inline">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-trash"></i> Yes, Delete Instructor
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
     <div class="col-md-8">
         <div class="card-custom">
